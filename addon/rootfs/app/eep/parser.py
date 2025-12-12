@@ -120,6 +120,14 @@ class EEPParser:
                 if shortcut is None or bitoffs is None or bitsize is None:
                     continue
                 
+                # Convert bitoffs and bitsize to integers if they're strings
+                try:
+                    bitoffs = int(bitoffs)
+                    bitsize = int(bitsize)
+                except (ValueError, TypeError) as e:
+                    logger.error(f"Invalid bitoffs/bitsize for {shortcut}: bitoffs={bitoffs}, bitsize={bitsize}")
+                    continue
+                
                 # Extract raw value
                 raw_value = self.extract_bits(data_bytes, bitoffs, bitsize)
                 
