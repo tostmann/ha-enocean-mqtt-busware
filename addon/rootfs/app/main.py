@@ -240,12 +240,14 @@ class EnOceanMQTTService:
         """Main run loop"""
         self.running = True
         
-        # Register service with state manager for web UI access
-        service_state.set_service(self)
-        
+        # Initialize first, THEN register with state manager
         if not await self.initialize():
             logger.error("Initialization failed, exiting")
             return
+        
+        # NOW register service with state manager (after initialization complete)
+        service_state.set_service(self)
+        logger.info("✓ Service registered with state manager")
         
         # Store gateway info if available
         if self.serial_handler:
@@ -262,8 +264,10 @@ class EnOceanMQTTService:
             except Exception as e:
                 logger.error(f"Error storing gateway info: {e}")
         
-        logger.info("Service is running...")
+        logger.info("=" * 60)
+        logger.info("Service is running!")
         logger.info("Web UI available via Home Assistant ingress")
+        logger.info("=" * 60)
         
         # Run web server and serial reader concurrently
         tasks = [

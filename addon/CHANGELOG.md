@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.6] - 2025-12-12
+
+### Fixed
+- **Critical: Service Initialization Order** - Fixed race condition causing 404 errors
+- Service components now fully initialized BEFORE web UI starts accepting requests
+- Moved `service_state.set_service()` call to AFTER `initialize()` completes
+- This ensures eep_loader, device_manager, and mqtt_handler are available when API is called
+
+### Technical Details
+- Previously: service_state was set before initialization, causing components to be None
+- Now: initialization completes first, then service is registered with state manager
+- Web server still starts concurrently but components are guaranteed to exist
+- Fixes 404 errors and JSON parsing issues caused by missing components
+
+### Impact
+- Resolves "Error loading devices" JSON parse errors
+- Resolves 404 errors on /api/eep-profiles
+- Resolves 404 errors on /api/status and /api/devices
+- All API endpoints now work reliably on first load
+
 ## [1.0.5] - 2025-12-12
 
 ### Fixed
