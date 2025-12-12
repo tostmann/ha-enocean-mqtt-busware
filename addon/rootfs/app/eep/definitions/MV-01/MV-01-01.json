@@ -7,9 +7,13 @@
   "type_title": "Kessel Staufix Control",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "AL"
-    ],
+    "AL": {
+      "name": "Alarm",
+      "component": "binary_sensor",
+      "device_class": "problem",
+      "icon": "mdi:pipe-valve",
+      "description": "Staufix alarm status"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.0.14] - 2025-12-12
+
+### Fixed
+- **CRITICAL: AL (Alarm) entity not being published** - Fixed MV-01-01 profile
+- AL entity was in "preDefined" array but not in "objects" dictionary
+- get_entities() only reads from objects dictionary, so AL was never discovered
+- Added AL entity definition to objects with proper binary_sensor configuration
+
+### Technical Details
+- Bug: AL was defined as `"preDefined": ["AL"]` but missing from `objects: {}`
+- Fix: Added AL to objects dictionary with full entity definition
+- Component: binary_sensor
+- Device class: problem
+- Icon: mdi:pipe-valve
+
+### Impact
+- AL (Alarm) entity now appears in Home Assistant
+- All three entities now published correctly:
+  - binary_sensor.staufix_control_alarm (AL)
+  - sensor.staufix_control_rssi (rssi)
+  - sensor.staufix_control_last_seen (last_seen)
+- State data now includes AL value
+- MQTT discovery works correctly
+
+### What Was Broken
+- Only rssi and last_seen entities were being created
+- AL entity was completely missing
+- State topic had no data
+- Users saw empty/incomplete device
+
+### What's Fixed Now
+- All entities created correctly
+- State data published to MQTT
+- Complete device functionality
+- Proper alarm monitoring
+
 ## [1.0.13] - 2025-12-12
 
 ### Added
