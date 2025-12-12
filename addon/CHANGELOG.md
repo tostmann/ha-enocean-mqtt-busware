@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.0.11] - 2025-12-12
+
+### Added
+- **RSSI Sensor** - Signal strength now available in Home Assistant
+- **Last Seen Sensor** - Timestamp of last telegram received
+- RSSI and timestamp included in all MQTT state messages
+- New sensors automatically discovered in Home Assistant
+
+### Improved
+- State data now includes rssi and last_seen fields
+- MV-01-01 profile updated with rssi and last_seen sensors
+- Better device monitoring with signal strength tracking
+- Timestamp tracking for device activity
+
+### Technical Details
+- RSSI added to parsed_data before MQTT publish
+- Timestamp added using datetime.now().isoformat()
+- Both sensors configured with appropriate device_class
+- RSSI uses signal_strength device class with dBm unit
+- Last Seen uses timestamp device class
+
+### Home Assistant Integration
+- RSSI sensor shows signal strength in dBm
+- Last Seen sensor shows last telegram time
+- Both sensors update with each telegram
+- Useful for monitoring device connectivity
+
 ## [1.0.10] - 2025-12-12
 
 ### Added

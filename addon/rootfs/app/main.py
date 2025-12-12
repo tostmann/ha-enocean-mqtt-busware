@@ -228,6 +228,11 @@ class EnOceanMQTTService:
             parsed_data = self.eep_parser.parse_telegram_with_full_data(packet.data, profile)
             
             if parsed_data:
+                # Add RSSI and timestamp to parsed data
+                from datetime import datetime
+                parsed_data['rssi'] = rssi
+                parsed_data['last_seen'] = datetime.now().isoformat()
+                
                 logger.info(f"  Parsed data: {parsed_data}")
                 
                 # Publish to MQTT

@@ -15,6 +15,21 @@
       "device_class": "problem",
       "icon": "mdi:pipe-valve",
       "description": "Backwater alarm status"
+    },
+    "rssi": {
+      "name": "RSSI",
+      "component": "sensor",
+      "device_class": "signal_strength",
+      "unit": "dBm",
+      "icon": "mdi:wifi",
+      "description": "Signal strength"
+    },
+    "last_seen": {
+      "name": "Last Seen",
+      "component": "sensor",
+      "device_class": "timestamp",
+      "icon": "mdi:clock-outline",
+      "description": "Last telegram received"
     }
   },
   "case": [
