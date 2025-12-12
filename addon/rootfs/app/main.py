@@ -177,8 +177,24 @@ class EnOceanMQTTService:
             logger.info(f"   RSSI: {rssi} dBm")
             logger.info(f"   Data: {data_hex}")
             
-            # Check if it's a teach-in telegram
-            if packet.is_teach_in():
+            # For 4BS telegrams, check if real device ID is in data payload
+            real_device_id = sender_id
+            if rorg == 0xA5 and len(packet.data) >= 9:
+                # Extract potential real device ID from data bytes 5-8
+                potential_id = ''.join(f'{b:02x}' for b in packet.data[5:9])
+                # Check if this ID is configured
+                if self.device_manager.get_device(potential_id):
+                    real_device_id = potential_id
+                    logger.info(f"   📱 Using real device ID from data: {real_device_id}")
+            
+            # Check if device is already configured - if so, treat as data even if LRN=0
+            device = self.device_manager.get_device(real_device_id)
+            
+            # Update sender_id to real_device_id for rest of processing
+            sender_id = real_device_id
+            
+            # Check if it's a teach-in telegram (but not for already configured devices)
+            if packet.is_teach_in() and not device:
                 logger.warning("=" * 80)
                 logger.warning("🎓 TEACH-IN TELEGRAM DETECTED!")
                 logger.warning(f"   Device ID: {sender_id}")
