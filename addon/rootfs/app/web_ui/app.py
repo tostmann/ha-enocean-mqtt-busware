@@ -22,7 +22,7 @@ templates = Jinja2Templates(directory=str(templates_dir))
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     """Main dashboard"""
-    return templates.TemplateResponse("dashboard.html", {
+    return templates.TemplateResponse("dashboard_new.html", {
         "request": request,
         "title": "EnOcean MQTT Slim",
         "status": "Running"
@@ -38,9 +38,23 @@ async def health():
 @app.get("/api/status")
 async def get_status():
     """Get service status"""
+    # TODO: Get real data from service
     return {
         "status": "running",
         "eep_profiles": 1,
         "devices": 0,
-        "gateway_connected": True
+        "gateway_connected": True,
+        "mqtt_connected": True
+    }
+
+
+@app.get("/api/gateway-info")
+async def get_gateway_info():
+    """Get gateway information"""
+    # TODO: Get real data from service
+    return {
+        "base_id": "ffd1f400",
+        "version": "2.15.0.0",
+        "chip_id": "0594a3e8",
+        "description": "GATEWAYCTRL"
     }
