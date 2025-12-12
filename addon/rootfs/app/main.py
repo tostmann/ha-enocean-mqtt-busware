@@ -9,6 +9,8 @@ from datetime import datetime
 
 from core.serial_handler import SerialHandler
 from core.esp3_protocol import ESP3Packet
+from core.mqtt_handler import MQTTHandler
+from core.device_manager import DeviceManager
 from eep.loader import EEPLoader
 from eep.parser import EEPParser
 from web_ui.app import app as web_app
@@ -29,6 +31,8 @@ class EnOceanMQTTService:
     
     def __init__(self):
         self.serial_handler = None
+        self.mqtt_handler = None
+        self.device_manager = None
         self.eep_loader = None
         self.eep_parser = None
         self.running = False
@@ -94,16 +98,65 @@ class EnOceanMQTTService:
             logger.warning("No serial port configured")
             logger.info("Running in web UI only mode")
         
-        # MQTT connection info
-        logger.info(f"MQTT Broker: {self.mqtt_host}:{self.mqtt_port}")
+        # Initialize device manager
+        logger.info("Initializing device manager...")
+        self.device_manager = DeviceManager()
+        logger.info(f"✓ Loaded {len(self.device_manager.list_devices())} configured devices")
+        
+        # Initialize MQTT
+        logger.info(f"Connecting to MQTT broker: {self.mqtt_host}:{self.mqtt_port}")
         if self.mqtt_user:
-            logger.info(f"MQTT User: {self.mqtt_user}")
+            logger.info(f"  MQTT User: {self.mqtt_user}")
+        
+        self.mqtt_handler = MQTTHandler(
+            self.mqtt_host,
+            self.mqtt_port,
+            self.mqtt_user,
+            self.mqtt_password
+        )
+        
+        if self.mqtt_handler.connect():
+            # Wait a moment for connection
+            await asyncio.sleep(1)
+            if self.mqtt_handler.connected:
+                logger.info("✓ MQTT connected successfully")
+                
+                # Publish discovery for all configured devices
+                for device in self.device_manager.list_devices():
+                    if device.get('enabled'):
+                        await self.publish_device_discovery(device)
+            else:
+                logger.warning("MQTT connection pending...")
+        else:
+            logger.error("Failed to connect to MQTT broker")
         
         logger.info("=" * 60)
         logger.info("Initialization complete!")
         logger.info("=" * 60)
         
         return True
+    
+    async def publish_device_discovery(self, device: dict):
+        """Publish MQTT discovery for a device"""
+        try:
+            # Get EEP profile
+            profile = self.eep_loader.get_profile(device['eep'])
+            if not profile:
+                logger.warning(f"EEP profile {device['eep']} not found for device {device['id']}")
+                return
+            
+            # Publish discovery for each entity
+            entities = profile.get_entities()
+            for entity in entities:
+                self.mqtt_handler.publish_discovery(device, entity)
+            
+            # Publish initial availability
+            self.mqtt_handler.publish_availability(device['id'], True)
+            
+            logger.info(f"Published discovery for device {device['id']} ({device['name']})")
+            
+        except Exception as e:
+            logger.error(f"Error publishing device discovery: {e}")
     
     async def process_telegram(self, packet: ESP3Packet):
         """Process received EnOcean telegram"""
@@ -117,17 +170,47 @@ class EnOceanMQTTService:
             # Check if it's a teach-in telegram
             if packet.is_teach_in():
                 logger.info(f"  → Teach-in telegram detected!")
+                return
             
-            # For now, just log the raw data
-            data_bytes = packet.get_data_bytes()
-            logger.debug(f"  Data: {data_bytes.hex()}")
+            # Look up device
+            device = self.device_manager.get_device(sender_id)
+            if not device:
+                logger.debug(f"  Unknown device {sender_id} - not configured")
+                return
             
-            # TODO: Look up device in database
-            # TODO: Parse using EEP profile
-            # TODO: Publish to MQTT
+            if not device.get('enabled'):
+                logger.debug(f"  Device {sender_id} is disabled")
+                return
+            
+            logger.info(f"  → Device: {device['name']} ({device['eep']})")
+            
+            # Update last seen
+            self.device_manager.update_last_seen(sender_id, rssi)
+            
+            # Get EEP profile
+            profile = self.eep_loader.get_profile(device['eep'])
+            if not profile:
+                logger.warning(f"  EEP profile {device['eep']} not found")
+                return
+            
+            # Parse telegram
+            parsed_data = self.eep_parser.parse_telegram_with_full_data(packet.data, profile)
+            
+            if parsed_data:
+                logger.info(f"  Parsed data: {parsed_data}")
+                
+                # Publish to MQTT
+                if self.mqtt_handler and self.mqtt_handler.connected:
+                    self.mqtt_handler.publish_state(sender_id, parsed_data)
+                    self.mqtt_handler.publish_availability(sender_id, True)
+                    logger.info(f"  → Published to MQTT")
+                else:
+                    logger.warning("  MQTT not connected, skipping publish")
+            else:
+                logger.warning("  Failed to parse telegram data")
             
         except Exception as e:
-            logger.error(f"Error processing telegram: {e}")
+            logger.error(f"Error processing telegram: {e}", exc_info=True)
     
     async def run_serial_reader(self):
         """Run serial reader task"""
