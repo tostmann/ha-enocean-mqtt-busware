@@ -34,7 +34,7 @@
                 <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
             </span>
             <div>
-                <span class="badge bg-light text-dark me-2">v1.0.7</span>
+                <span class="badge bg-light text-dark me-2">v1.0.8</span>
                 <span class="badge bg-success" id="status-badge">Running</span>
             </div>
         </div>
@@ -246,7 +246,7 @@
 
         async function refreshStatus() {
             try {
-                const response = await fetch('/api/status');
+                const response = await fetch('api/status');
                 const data = await response.json();
                 
                 document.getElementById('status-badge').textContent = data.status === 'running' ? 'Running' : 'Stopped';
@@ -268,7 +268,7 @@
 
         async function refreshDevices() {
             try {
-                const response = await fetch('/api/devices');
+                const response = await fetch('api/devices');
                 const data = await response.json();
                 const devices = data.devices || [];
                 
@@ -362,7 +362,7 @@
 
         async function loadEEPProfiles() {
             try {
-                const response = await fetch('/api/eep-profiles');
+                const response = await fetch('api/eep-profiles');
                 const data = await response.json();
                 const profiles = data.profiles || [];
                 
@@ -448,7 +448,7 @@
                     });
                 } else {
                     // Create new device
-                    response = await fetch('/api/devices', {
+                    response = await fetch('api/devices', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
@@ -518,7 +518,7 @@
 
         async function showGatewayInfo() {
             try {
-                const response = await fetch('/api/gateway-info');
+                const response = await fetch('api/gateway-info');
                 const data = await response.json();
                 
                 document.getElementById('gw-base-id').textContent = data.base_id || 'Not available';
@@ -534,7 +534,7 @@
 
         async function showEEPProfiles() {
             try {
-                const response = await fetch('/api/eep-profiles');
+                const response = await fetch('api/eep-profiles');
                 const data = await response.json();
                 const profiles = data.profiles || [];
                 

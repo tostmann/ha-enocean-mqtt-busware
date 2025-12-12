@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.8] - 2025-12-12
+
+### Fixed
+- **CRITICAL: Ingress Path Issue** - Fixed 404 errors caused by absolute API paths
+- Changed all fetch() calls from `/api/...` to `api/...` (relative paths)
+- This fixes the issue where API calls were going to wrong URLs through Home Assistant ingress
+- All API endpoints now work correctly through ingress proxy
+
+### Technical Details
+- Problem: JavaScript was calling `/api/status` which resolved to `http://192.168.1.130:8123/api/status`
+- Should be: `api/status` which resolves to ingress path + `api/status`
+- Fixed all fetch calls: status, devices, eep-profiles, gateway-info, and all POST/PUT/DELETE operations
+- Relative paths work correctly with Home Assistant's ingress proxy system
+
+### Impact
+- ✅ Fixes all 404 errors on API endpoints
+- ✅ Status, Gateway, EEP Profiles, and Devices now load correctly
+- ✅ Add/Edit/Delete device operations now work
+- ✅ All modals display correct data
+
 ## [1.0.7] - 2025-12-12
 
 ### Added
