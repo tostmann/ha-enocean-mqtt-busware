@@ -105,7 +105,6 @@ class MQTTHandler:
                 "name": f"{device['name']} {entity['name']}",
                 "unique_id": unique_id,
                 "state_topic": f"enocean/{device_id}/state",
-                "value_template": f"{{{{ value_json.{entity_shortcut} }}}}",
                 "availability_topic": f"enocean/{device_id}/availability",
                 "device": {
                     "identifiers": [f"enocean_{device_id}"],
@@ -115,6 +114,14 @@ class MQTTHandler:
                     "via_device": "enocean_gateway"
                 }
             }
+            
+            # Set value_template based on component type
+            if component == 'binary_sensor':
+                # For binary sensors, convert 0/1 to OFF/ON
+                payload['value_template'] = f"{{{{{{ 'ON' if value_json.{entity_shortcut} == 1 else 'OFF' }}}}}}"
+            else:
+                # For regular sensors, use value directly
+                payload['value_template'] = f"{{{{ value_json.{entity_shortcut} }}}}"
             
             # Add optional fields
             if entity.get('device_class'):
