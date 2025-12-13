@@ -368,9 +368,9 @@ class EnOceanMQTTService:
             
             if parsed_data:
                 # Add RSSI and timestamp to parsed data
-                from datetime import datetime
+                from datetime import datetime, timezone
                 parsed_data['rssi'] = rssi
-                parsed_data['last_seen'] = datetime.now().isoformat()
+                parsed_data['last_seen'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
                 
                 logger.info(f"  Parsed data: {parsed_data}")
                 
