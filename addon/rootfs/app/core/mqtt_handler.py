@@ -118,7 +118,7 @@ class MQTTHandler:
             # Set value_template based on component type
             if component == 'binary_sensor':
                 # For binary sensors, convert 0/1 to OFF/ON
-                payload['value_template'] = f"{{{{{{ 'ON' if value_json.{entity_shortcut} == 1 else 'OFF' }}}}}}"
+                payload['value_template'] = f"{{% if value_json.{entity_shortcut} == 1 %}}ON{{% else %}}OFF{{% endif %}}"
             else:
                 # For regular sensors, use value directly
                 payload['value_template'] = f"{{{{ value_json.{entity_shortcut} }}}}"
