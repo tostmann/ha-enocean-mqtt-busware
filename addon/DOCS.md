@@ -108,6 +108,68 @@ The alarm entity will automatically update when water is detected!
 - MQTT status
 - System diagnostics
 
+## Custom EEP Profiles
+
+### Adding Custom or Override Profiles
+
+You can add your own custom EEP profiles or override built-in profiles by placing JSON files in:
+
+```
+/config/enocean_custom_profiles/
+```
+
+**Quick Example:**
+
+1. Create the directory: `/config/enocean_custom_profiles/`
+2. Add a JSON file (e.g., `MY-CUSTOM-01.json`)
+3. Restart the addon
+4. Your custom profile appears in the EEP dropdown!
+
+**Features:**
+- ✅ Add support for new EnOcean devices
+- ✅ Override built-in profiles with custom configurations
+- ✅ Customize entity names, icons, and device classes
+- ✅ Subdirectories supported
+
+**Example Custom Profile:**
+```json
+{
+  "eep": "MY-CUSTOM-01",
+  "rorg_number": "0xa5",
+  "func_number": "0x30",
+  "type_number": "0x01",
+  "type_title": "My Custom Sensor",
+  "manufacturer": "My Company",
+  "objects": {
+    "temperature": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C"
+    }
+  },
+  "case": [...]
+}
+```
+
+**📚 Complete Documentation:**
+
+For detailed instructions, JSON format reference, and 150+ examples:
+
+👉 **[Custom EEP Profiles Guide](https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/CUSTOM_EEP_PROFILES_GUIDE.md)**
+
+**Browse Built-in Profiles for Examples:**
+
+👉 **[EEP Definitions on GitHub](https://github.com/ESDN83/ha-enocean-mqtt-slim/tree/main/addon/rootfs/app/eep/definitions)**
+
+Popular examples:
+- [A5-02-05.json](https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/addon/rootfs/app/eep/definitions/A5-02/A5-02-05.json) - Temperature sensor
+- [F6-02-01.json](https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/addon/rootfs/app/eep/definitions/F6-02/F6-02-01.json) - Rocker switch
+- [D5-00-01.json](https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/addon/rootfs/app/eep/definitions/D5-00/D5-00-01.json) - Window contact
+- [MV-01-01.json](https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/addon/rootfs/app/eep/definitions/MV-01/MV-01-01.json) - Kessel Staufix
+
+---
+
 ## Troubleshooting
 
 ### Device Not Detected

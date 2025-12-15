@@ -189,21 +189,11 @@ class EnOceanMQTTService:
             logger.info(f"   RSSI: {rssi} dBm")
             logger.info(f"   Data: {data_hex}")
             
-            # For 4BS telegrams, check if real device ID is in data payload
-            real_device_id = sender_id
-            if rorg == 0xA5 and len(packet.data) >= 9:
-                # Extract potential real device ID from data bytes 5-8
-                potential_id = ''.join(f'{b:02x}' for b in packet.data[5:9])
-                # Check if this ID is configured
-                if self.device_manager.get_device(potential_id):
-                    real_device_id = potential_id
-                    logger.info(f"   📱 Using real device ID from data: {real_device_id}")
+            # Sender ID is now correctly extracted by get_sender_id() in esp3_protocol.py
+            # No workaround needed!
             
             # Check if device is already configured - if so, treat as data even if LRN=0
-            device = self.device_manager.get_device(real_device_id)
-            
-            # Update sender_id to real_device_id for rest of processing
-            sender_id = real_device_id
+            device = self.device_manager.get_device(sender_id)
             
             # Check if it's a teach-in telegram (but not for already configured devices)
             if packet.is_teach_in() and not device:
@@ -217,24 +207,19 @@ class EnOceanMQTTService:
                 # Try to auto-detect EEP profile from teach-in telegram
                 detected_eep = None
                 device_name = f"Device {sender_id}"
-                real_device_id = sender_id  # Default to sender ID
                 
                 # For 4BS (A5) teach-in telegrams with EEP
                 if rorg == 0xA5 and len(packet.data) >= 9:
                     # 4BS teach-in telegram format:
                     # Byte 0: RORG (A5)
                     # Byte 1-4: DB3, DB2, DB1, DB0 (teach-in data)
-                    # Byte 5-8: Real device ID (4 bytes)
+                    # Byte 5-8: Sender ID (4 bytes) - already correctly extracted by get_sender_id()
                     # Byte 9: Status
                     
                     db3 = packet.data[1]
                     db2 = packet.data[2]
                     db1 = packet.data[3]
                     db0 = packet.data[4]
-                    
-                    # Extract real device ID from data payload
-                    real_device_id = ''.join(f'{b:02x}' for b in packet.data[5:9])
-                    logger.warning(f"   📱 Real Device ID (from data): {real_device_id}")
                     
                     # Check LRN bit (DB0.3) - 0 = teach-in
                     lrn_bit = (db0 >> 3) & 0x01
@@ -255,9 +240,9 @@ class EnOceanMQTTService:
                         else:
                             logger.warning(f"   ⚠️  Profile {detected_eep} not in database")
                 
-                # Use real device ID for all operations
-                sender_id = real_device_id
-                device_name = f"Device {sender_id}" if not detected_eep else device_name
+                # Device name defaults to sender_id if no EEP detected
+                if not detected_eep:
+                    device_name = f"Device {sender_id}"
                 
                 # Check if device already exists
                 existing_device = self.device_manager.get_device(sender_id)

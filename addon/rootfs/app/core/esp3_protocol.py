@@ -122,9 +122,10 @@ class ESP3Packet:
     def get_sender_id(self) -> Optional[str]:
         """Extract sender ID from radio telegram"""
         if self.packet_type == self.PACKET_TYPE_RADIO_ERP1:
-            if len(self.data) >= 5:
-                # Sender ID is bytes 1-4 (after RORG)
-                sender_bytes = self.data[1:5]
+            # Sender ID is always the last 4 bytes before status byte
+            # Structure: [RORG] [Data...] [Sender ID - 4 bytes] [Status - 1 byte]
+            if len(self.data) >= 6:  # Minimum: RORG + 1 data + 4 sender + 1 status
+                sender_bytes = self.data[-5:-1]  # Last 4 bytes before status
                 return sender_bytes.hex()
         return None
     
@@ -145,11 +146,12 @@ class ESP3Packet:
         return None
     
     def get_data_bytes(self) -> bytes:
-        """Get data bytes (without sender ID and status)"""
+        """Get data bytes (without RORG, sender ID, and status)"""
         if self.packet_type == self.PACKET_TYPE_RADIO_ERP1:
             if len(self.data) >= 6:
-                # Data bytes are after sender ID (4 bytes) and before status byte
-                return self.data[5:-1]
+                # Data is between RORG and sender ID
+                # Structure: [RORG] [Data...] [Sender ID - 4 bytes] [Status - 1 byte]
+                return self.data[1:-5]  # Skip RORG, skip last 5 bytes (4 ID + 1 status)
         return b''
     
     def get_status_byte(self) -> Optional[int]:
