@@ -62,7 +62,13 @@ A lightweight, modern EnOcean to MQTT bridge for Home Assistant with automatic d
 - **[Kessel Staufix Analysis](docs/KESSEL_STAUFIX_ANALYSIS.md)** - Compatibility analysis
 
 ### Release Notes
-- **[v1.0.30 (Latest)](docs/RELEASE_NOTES_v1.0.30_CRITICAL_FIX.md)** - Critical sender ID fix
+- **[Complete Release Notes (v1.0.30-35)](docs/RELEASE_NOTES.md)** - All versions with full details
+- **[v1.0.35](docs/RELEASE_NOTES.md#v1035---rgb-lighting-support-2025-12-15)** - RGB Lighting Support
+- **[v1.0.34](docs/RELEASE_NOTES.md#v1034---searchable-profile-selector-2025-12-15)** - Searchable Profile Selector + D2-01-12
+- **[v1.0.33](docs/RELEASE_NOTES.md#v1033---state-feedback--command-confirmation-2025-12-15)** - State Feedback & Command Confirmation
+- **[v1.0.32](docs/RELEASE_NOTES.md#v1032---bidirectional-control-foundation-2025-12-15)** - Bidirectional Control Foundation
+- **[v1.0.31](docs/RELEASE_NOTES.md#v1031---enhanced-device-management-2025-12-15)** - Enhanced Device Management
+- **[v1.0.30](docs/RELEASE_NOTES_v1.0.30_CRITICAL_FIX.md)** - CRITICAL BUG FIX - Sender ID Extraction
 - **[v1.0.29](docs/COMMUNITY_RESPONSE_v1.0.29.md)** - Community response
 - **[v1.0.28](docs/RELEASE_NOTES_v1.0.28.md)** - Previous release
 - **[v1.0.2](docs/RELEASE_NOTES_v1.0.2.md)** - Initial release
