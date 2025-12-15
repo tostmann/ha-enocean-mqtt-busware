@@ -34,7 +34,7 @@
                 <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
             </span>
             <div>
-                <span class="badge bg-light text-dark me-2">v1.0.33</span>
+                <span class="badge bg-light text-dark me-2">v1.0.34</span>
                 <span class="badge bg-success" id="status-badge">Running</span>
             </div>
         </div>
@@ -152,10 +152,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="deviceEEP" class="form-label">EEP Profile *</label>
-                            <select class="form-select" id="deviceEEP" required>
+                            <input type="text" class="form-control mb-2" id="eepSearch" placeholder="Search profiles... (e.g., switch, temperature, D2-01)">
+                            <select class="form-select" id="deviceEEP" required size="8" style="height: 200px;">
                                 <option value="">Loading profiles...</option>
                             </select>
-                            <small class="text-muted">Select the EnOcean Equipment Profile</small>
+                            <small class="text-muted">Search and select the EnOcean Equipment Profile</small>
                         </div>
                         <div class="mb-3">
                             <label for="deviceManufacturer" class="form-label">Manufacturer</label>
@@ -394,24 +395,52 @@
             }
         }
 
+        let allEEPProfiles = [];
+
         async function loadEEPProfiles() {
             try {
                 const response = await fetch('api/eep-profiles');
                 const data = await response.json();
-                const profiles = data.profiles || [];
+                allEEPProfiles = data.profiles || [];
                 
-                const select = document.getElementById('deviceEEP');
-                select.innerHTML = '<option value="">Select EEP Profile...</option>';
+                renderEEPSelect(allEEPProfiles);
                 
-                profiles.forEach(profile => {
-                    const option = document.createElement('option');
-                    option.value = profile.eep;
-                    option.textContent = `${profile.eep} - ${profile.title}`;
-                    select.appendChild(option);
-                });
+                // Setup search listener
+                const searchInput = document.getElementById('eepSearch');
+                searchInput.addEventListener('input', filterEEPSelect);
             } catch (error) {
                 console.error('Error loading EEP profiles:', error);
             }
+        }
+
+        function renderEEPSelect(profiles) {
+            const select = document.getElementById('deviceEEP');
+            select.innerHTML = '<option value="">Select EEP Profile...</option>';
+            
+            profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile.eep;
+                option.textContent = `${profile.eep} - ${profile.title}`;
+                option.dataset.description = profile.description || '';
+                select.appendChild(option);
+            });
+        }
+
+        function filterEEPSelect() {
+            const searchTerm = document.getElementById('eepSearch').value.toLowerCase();
+            
+            if (!searchTerm) {
+                renderEEPSelect(allEEPProfiles);
+                return;
+            }
+            
+            const filtered = allEEPProfiles.filter(profile => {
+                return profile.eep.toLowerCase().includes(searchTerm) ||
+                       profile.title.toLowerCase().includes(searchTerm) ||
+                       (profile.description && profile.description.toLowerCase().includes(searchTerm));
+            });
+            
+            renderEEPSelect(filtered);
         }
 
         function showAddDeviceModal() {
