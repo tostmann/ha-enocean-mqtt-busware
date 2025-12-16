@@ -1,4 +1,5 @@
-# EnOcean MQTT Slim
+ # :warning: WIP - Not a stable version yet! but please test and provide feedback!
+# EnOcean MQTT Slim 
 
 [![GitHub Release](https://img.shields.io/github/v/release/ESDN83/ha-enocean-mqtt-slim)](https://github.com/ESDN83/ha-enocean-mqtt-slim/releases)
 [![License](https://img.shields.io/github/license/ESDN83/ha-enocean-mqtt-slim)](LICENSE)
