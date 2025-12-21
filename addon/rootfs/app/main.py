@@ -217,6 +217,17 @@ class EnOceanMQTTService:
             # Check if device is controllable
             is_controllable = self.command_translator.is_controllable(device['eep'])
             
+            # IMPORTANT: Clear old retained state messages BEFORE publishing discovery
+            # This prevents Home Assistant from seeing stale state before config
+            device_id = device['id']
+            if self.mqtt_handler and self.mqtt_handler.connected:
+                # Clear old state topic (publish empty retained message)
+                self.mqtt_handler.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=True)
+                self.mqtt_handler.client.publish(f"enocean/{device_id}/availability", "", qos=1, retain=True)
+                logger.debug(f"Cleared old retained messages for {device_id}")
+                # Small delay to ensure order
+                await asyncio.sleep(0.1)
+            
             # Publish discovery for each entity
             entities = profile.get_entities()
             for entity in entities:
