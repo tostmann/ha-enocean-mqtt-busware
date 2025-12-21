@@ -21,6 +21,10 @@ import uvicorn
 # Import web app after service_state to ensure proper initialization
 from web_ui.app import app as web_app
 
+# Import at module level for use in teach-in handling
+import sys
+sys.path.insert(0, '/app')
+
 # Configure logging
 log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
 logging.basicConfig(
@@ -321,9 +325,9 @@ class EnOceanMQTTService:
                             logger.warning("")
                             
                             # Cache detected profiles for Web UI
-                            from service_state import service_state
                             profile_eeps = [prof.eep for prof in matching_profiles]
                             service_state.set_detected_profiles(sender_id, profile_eeps)
+                            logger.info(f"   📝 Cached {len(profile_eeps)} profiles for device {sender_id}: {profile_eeps}")
                             
                             # Don't auto-add - require manual selection
                             detected_eep = None

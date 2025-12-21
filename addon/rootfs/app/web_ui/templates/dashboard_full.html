@@ -34,7 +34,7 @@
                 <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
             </span>
             <div>
-                <span class="badge bg-light text-dark me-2">v1.0.42</span>
+                <span class="badge bg-light text-dark me-2">v1.0.43</span>
                 <span class="badge bg-success" id="status-badge">Running</span>
             </div>
         </div>
@@ -534,14 +534,19 @@
                 
                 // Fetch suggested profiles for this device ID
                 try {
+                    console.log(`Fetching suggestions for device ID: ${value}`);
                     const response = await fetch(`api/suggest-profiles/${value}`);
                     const data = await response.json();
+                    console.log('API Response:', data);
                     
                     if (data.has_suggestions && data.suggested_profiles.length > 0) {
+                        console.log(`Found ${data.suggested_profiles.length} suggested profiles:`, data.suggested_profiles);
+                        
                         // Filter EEP dropdown to show only suggested profiles
                         const filtered = allEEPProfiles.filter(profile => 
                             data.suggested_profiles.some(suggested => suggested.eep === profile.eep)
                         );
+                        console.log(`Filtered to ${filtered.length} profiles`);
                         renderEEPSelect(filtered);
                         
                         helpText.textContent = `✓ Found ${data.suggested_profiles.length} compatible profile(s) from teach-in detection!`;
@@ -550,6 +555,7 @@
                         // Clear search box to show filtered results
                         document.getElementById('eepSearch').value = '';
                     } else {
+                        console.log('No suggestions found, showing all profiles');
                         // No suggestions - show all profiles
                         renderEEPSelect(allEEPProfiles);
                         helpText.textContent = '✓ Valid device ID format (showing all profiles)';
