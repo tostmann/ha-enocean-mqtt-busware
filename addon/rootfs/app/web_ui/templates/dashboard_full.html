@@ -34,7 +34,7 @@
                 <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
             </span>
             <div>
-                <span class="badge bg-light text-dark me-2">v1.0.39</span>
+                <span class="badge bg-light text-dark me-2">v1.0.40</span>
                 <span class="badge bg-success" id="status-badge">Running</span>
             </div>
         </div>
@@ -457,6 +457,16 @@
             const deviceIdInput = document.getElementById('deviceId');
             deviceIdInput.removeEventListener('input', formatDeviceId);
             deviceIdInput.addEventListener('input', formatDeviceId);
+            
+            // Re-attach EEP search listener (defensive)
+            const searchInput = document.getElementById('eepSearch');
+            if (searchInput) {
+                searchInput.removeEventListener('input', filterEEPSelect);
+                searchInput.addEventListener('input', filterEEPSelect);
+                // Clear any previous search
+                searchInput.value = '';
+                renderEEPSelect(allEEPProfiles);
+            }
             
             deviceModal.show();
         }
