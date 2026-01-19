@@ -7,9 +7,6 @@
   "type_title": "Blind status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "POS"
-    ],
     "AS": {
       "type": "state",
       "common": {
@@ -27,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AN": {
       "type": "state",
@@ -43,7 +41,8 @@
         "def": 0,
         "unit": "°"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PVF": {
       "type": "state",
@@ -58,7 +57,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AVF": {
       "type": "state",
@@ -73,7 +73,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ES": {
       "type": "state",
@@ -94,7 +95,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "EP": {
       "type": "state",
@@ -115,7 +117,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ST": {
       "type": "state",
@@ -136,7 +139,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SM": {
       "type": "state",
@@ -151,7 +155,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "MOTP": {
       "type": "state",
@@ -170,7 +175,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

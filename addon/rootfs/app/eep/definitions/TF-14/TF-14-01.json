@@ -25,7 +25,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BS": {
       "type": "state",
@@ -44,7 +45,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

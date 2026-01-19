@@ -7,11 +7,22 @@
   "type_title": "Room Operating Panel Temperature, Humidity and Occupancy control",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "HUM",
-      "SLSW"
-    ],
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
+    "HUM": {
+      "name": "Humidity",
+      "component": "sensor",
+      "device_class": "humidity",
+      "unit": "%",
+      "icon": "mdi:water-percent",
+      "shortcut": "HUM"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

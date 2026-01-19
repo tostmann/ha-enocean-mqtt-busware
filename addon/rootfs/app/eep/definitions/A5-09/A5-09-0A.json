@@ -7,10 +7,6 @@
   "type_title": "Gas Sensor Hydrogen",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "SVC"
-    ],
     "Conc": {
       "type": "state",
       "common": {
@@ -25,7 +21,16 @@
         "def": 0,
         "unit": "ppm"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
     },
     "rssi": {
       "name": "RSSI",

@@ -7,9 +7,6 @@
   "type_title": "Multisensor Window Intrusion detection system for Windows",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "AL"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -26,7 +23,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AE": {
       "type": "state",
@@ -41,7 +39,8 @@
         "write": true,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "EPA": {
       "type": "state",
@@ -56,7 +55,8 @@
         "write": true,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SPIR": {
       "type": "state",
@@ -76,7 +76,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PA": {
       "type": "state",
@@ -91,7 +92,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CT": {
       "type": "state",
@@ -106,7 +108,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PAE": {
       "type": "state",
@@ -121,7 +124,8 @@
         "write": false,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "TP": {
       "type": "state",
@@ -141,7 +145,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PIR": {
       "type": "state",
@@ -160,7 +165,10 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "device_class": "motion",
+      "icon": "mdi:motion-sensor"
     },
     "rssi": {
       "name": "RSSI",

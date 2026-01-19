@@ -24,7 +24,8 @@
           "de": "Zeigt true an wenn Wasser erkannt wurde."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

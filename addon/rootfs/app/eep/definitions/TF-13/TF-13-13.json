@@ -7,11 +7,6 @@
   "type_title": "Light and Occupancy sensor Range 0lx to 2048lx",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "PIRS",
-      "ILL",
-      "SVC"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

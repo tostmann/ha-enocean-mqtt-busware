@@ -7,10 +7,6 @@
   "type_title": "PSC 152 Energy measurement",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "EC",
-      "AC"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

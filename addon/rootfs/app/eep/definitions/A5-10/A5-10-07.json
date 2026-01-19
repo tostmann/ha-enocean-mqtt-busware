@@ -7,10 +7,14 @@
   "type_title": "Room Operating Panel Temperature, Fan Speed control",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "FAN"
-    ],
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

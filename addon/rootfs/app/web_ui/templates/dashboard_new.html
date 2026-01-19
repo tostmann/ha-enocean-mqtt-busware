@@ -3,151 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnOcean MQTT Slim</title>
+    <title>EnOcean MQTT TCP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        .card-clickable {
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card-clickable:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .info-badge {
-            font-size: 0.85rem;
-        }
+        body { padding-top: 20px; }
+        .table-middle td { vertical-align: middle; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-primary">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">
-                <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
-            </span>
-            <span class="badge bg-success" id="status-badge">Loading...</span>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <!-- Alert Banner -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading"><i class="bi bi-check-circle"></i> System Running</h4>
-                    <p>EnOcean MQTT Slim is active and monitoring for telegrams.</p>
-                    <hr>
-                    <p class="mb-0">
-                        <strong>Version:</strong> 1.0.2 | 
-                        <strong>MQTT:</strong> <span id="mqtt-status">Checking...</span> |
-                        <strong>Gateway:</strong> <span id="gateway-status">Checking...</span>
-                    </p>
-                </div>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3><i class="bi bi-radio-tower"></i> EnOcean MQTT TCP</h3>
+            <div>
+                <small class="text-muted me-2">v<span id="app-version">...</span></small>
+                <span class="badge bg-secondary" id="status-badge">Connecting...</span>
             </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="row mt-4">
-            <!-- Gateway Card -->
-            <div class="col-md-4">
-                <div class="card card-clickable" onclick="showGatewayInfo()">
-                    <div class="card-body text-center">
-                        <i class="bi bi-hdd-network display-4 text-primary"></i>
-                        <h5 class="card-title mt-3">Gateway</h5>
-                        <p class="card-text">
-                            <span class="badge bg-success" id="gateway-badge">Connected</span><br>
-                            <small class="text-muted">Click for details</small>
-                        </p>
-                    </div>
+        <div class="row mb-4 text-center">
+            <div class="col-md-3">
+                <div class="p-3 border rounded bg-light">
+                    <h5>Devices</h5>
+                    <h3 id="device-count">0</h3>
                 </div>
             </div>
-
-            <!-- EEP Profiles Card -->
-            <div class="col-md-4">
-                <div class="card card-clickable" onclick="showEEPProfiles()">
-                    <div class="card-body text-center">
-                        <i class="bi bi-file-earmark-code display-4 text-info"></i>
-                        <h5 class="card-title mt-3">EEP Profiles</h5>
-                        <p class="card-text">
-                            <strong id="eep-count">1</strong> profile loaded<br>
-                            <small class="text-muted">Click to view</small>
-                        </p>
-                    </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded bg-light">
+                    <h5>Profiles (EEP)</h5>
+                    <h3 id="eep-count">0</h3>
                 </div>
             </div>
-
-            <!-- Devices Card -->
-            <div class="col-md-4">
-                <div class="card card-clickable" onclick="showDevices()">
-                    <div class="card-body text-center">
-                        <i class="bi bi-router display-4 text-warning"></i>
-                        <h5 class="card-title mt-3">Devices</h5>
-                        <p class="card-text">
-                            <strong id="device-count">0</strong> configured<br>
-                            <small class="text-muted">Click to manage</small>
-                        </p>
-                    </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded bg-light">
+                    <h5>Gateway</h5>
+                    <span id="gateway-status" class="badge bg-secondary">Unknown</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded bg-light">
+                    <h5>MQTT</h5>
+                    <span id="mqtt-status" class="badge bg-secondary">Unknown</span>
                 </div>
             </div>
         </div>
 
-        <!-- System Status -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-activity"></i> System Status</span>
-                        <button class="btn btn-sm btn-outline-primary" onclick="refreshStatus()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush" id="status-list">
-                            <li class="list-group-item">
-                                <i class="bi bi-hourglass-split text-warning"></i> Loading status...
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-3 d-flex justify-content-end">
+             <button id="btn-start-discovery" class="btn btn-primary" onclick="toggleDiscovery()">
+                <i class="bi bi-search"></i> Start Discovery
+            </button>
+            <button id="btn-stop-discovery" class="btn btn-danger d-none" onclick="toggleDiscovery()">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                Stop Discovery (<span id="discovery-timer">60</span>s)
+            </button>
         </div>
 
-        <!-- Info Panel (Hidden by default) -->
-        <div class="row mt-4" id="info-panel" style="display: none;">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span id="info-title"><i class="bi bi-info-circle"></i> Information</span>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="hideInfoPanel()">
-                            <i class="bi bi-x"></i> Close
-                        </button>
-                    </div>
-                    <div class="card-body" id="info-content">
-                        <!-- Dynamic content -->
-                    </div>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                Configured Devices
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped table-hover mb-0 table-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>EEP / Profile</th>
+                            <th>RORG</th>
+                            <th>Signal</th>
+                            <th>Last Seen</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="device-list">
+                        <tr><td colspan="7" class="text-center p-3">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+        
+        <div class="mt-3 text-muted small text-end">
+            <a href="/api/status" target="_blank">System Status JSON</a>
+        </div>
+    </div>
 
-        <!-- Quick Links -->
-        <div class="row mt-4 mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-link-45deg"></i> Quick Links
-                    </div>
-                    <div class="card-body">
-                        <a href="https://github.com/ESDN83/ha-enocean-mqtt-slim" class="btn btn-outline-primary me-2" target="_blank">
-                            <i class="bi bi-github"></i> GitHub
-                        </a>
-                        <a href="https://github.com/ESDN83/ha-enocean-mqtt-slim/issues" class="btn btn-outline-secondary me-2" target="_blank">
-                            <i class="bi bi-bug"></i> Report Issue
-                        </a>
-                        <a href="https://github.com/ESDN83/ha-enocean-mqtt-slim/blob/main/addon/DOCS.md" class="btn btn-outline-info" target="_blank">
-                            <i class="bi bi-book"></i> Documentation
-                        </a>
-                    </div>
+    <div class="modal fade" id="editDeviceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDeviceForm">
+                        <input type="hidden" id="edit-id">
+                        <input type="hidden" id="edit-rorg">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Device ID</label>
+                            <input type="text" class="form-control" id="edit-id-display" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Friendly Name</label>
+                            <input type="text" class="form-control" id="edit-name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">EEP Profile</label>
+                            <select class="form-select" id="edit-eep"></select>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="show-all-profiles" onchange="populateProfileDropdown()">
+                                <label class="form-check-label small" for="show-all-profiles">
+                                    Show all profiles (disable RORG filter)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="edit-enabled">
+                            <label class="form-check-label">Enable Device</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDevice()">Save</button>
                 </div>
             </div>
         </div>
@@ -155,149 +133,175 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Fetch status on load
-        window.addEventListener('load', function() {
+        let allProfiles = [];
+        let isDiscoveryRunning = false;
+        let currentEditDevice = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProfiles();
             refreshStatus();
+            loadDevices();
+            setInterval(refreshStatus, 2000);
+            setInterval(loadDevices, 10000);
         });
 
         async function refreshStatus() {
             try {
-                const response = await fetch('/api/status');
-                const data = await response.json();
+                const res = await fetch('/api/status');
+                const data = await res.json();
                 
-                // Update badges
-                document.getElementById('status-badge').textContent = data.status === 'running' ? 'Running' : 'Stopped';
-                document.getElementById('eep-count').textContent = data.eep_profiles || 1;
+                // Header Status
+                document.getElementById('status-badge').textContent = data.status;
+                document.getElementById('status-badge').className = data.status === 'running' ? 'badge bg-success' : 'badge bg-danger';
+                document.getElementById('app-version').textContent = data.version || 'dev';
+                
+                // Stats
+                updateBadge('gateway-status', data.gateway_connected);
+                updateBadge('mqtt-status', data.mqtt_connected);
                 document.getElementById('device-count').textContent = data.devices || 0;
-                document.getElementById('mqtt-status').textContent = data.mqtt_connected ? 'Connected' : 'Disconnected';
-                document.getElementById('gateway-status').textContent = data.gateway_connected ? 'Connected' : 'Disconnected';
+                document.getElementById('eep-count').textContent = data.eep_profiles || 0;
+
+                // Discovery Logic
+                const btnStart = document.getElementById('btn-start-discovery');
+                const btnStop = document.getElementById('btn-stop-discovery');
                 
-                // Update status list
-                const statusList = document.getElementById('status-list');
-                statusList.innerHTML = `
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        ESP3 Protocol Handler - Active
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        Serial Communication - ${data.gateway_connected ? 'Connected' : 'Disconnected'}
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        EEP Profile System - ${data.eep_profiles} profile(s) loaded
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        Telegram Listener - Running
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        MQTT Integration - ${data.mqtt_connected ? 'Connected' : 'Disconnected'}
-                    </li>
-                    <li class="list-group-item">
-                        <i class="bi bi-check-circle-fill text-success"></i> 
-                        Device Management - ${data.devices} device(s) configured
-                    </li>
-                `;
-            } catch (error) {
-                console.error('Error fetching status:', error);
+                if (data.discovery_active) {
+                    isDiscoveryRunning = true;
+                    btnStart.classList.add('d-none');
+                    btnStop.classList.remove('d-none');
+                    document.getElementById('discovery-timer').textContent = data.discovery_remaining;
+                } else {
+                    if (isDiscoveryRunning) loadDevices(); // Refresh once on stop
+                    isDiscoveryRunning = false;
+                    btnStart.classList.remove('d-none');
+                    btnStop.classList.add('d-none');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function updateBadge(id, connected) {
+            const el = document.getElementById(id);
+            el.textContent = connected ? 'Connected' : 'Disconnected';
+            el.className = connected ? 'badge bg-success' : 'badge bg-danger';
+        }
+
+        async function toggleDiscovery() {
+            const action = isDiscoveryRunning ? 'stop' : 'start';
+            await fetch('/api/system/discovery', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: action, duration: 60 })
+            });
+            refreshStatus();
+        }
+
+        async function loadProfiles() {
+            const res = await fetch('/api/eep-profiles');
+            const data = await res.json();
+            allProfiles = data.profiles || [];
+            allProfiles.sort((a,b) => a.eep.localeCompare(b.eep));
+        }
+
+        async function loadDevices() {
+            try {
+                const res = await fetch('/api/devices');
+                const data = await res.json();
+                const devices = data.devices || [];
+                const tbody = document.getElementById('device-list');
+                
+                if (devices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center p-3">No devices. Start Discovery to find devices.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = devices.map(dev => {
+                    const isPending = dev.eep === 'pending';
+                    const rowClass = isPending ? 'table-warning' : (dev.enabled ? '' : 'table-secondary');
+                    const devJson = JSON.stringify(dev).replace(/"/g, '&quot;');
+                    
+                    return `
+                        <tr class="${rowClass}">
+                            <td><small>${dev.id}</small></td>
+                            <td>${dev.name}</td>
+                            <td>${isPending ? '<span class="badge bg-warning text-dark">Pending Setup</span>' : dev.eep}</td>
+                            <td><small class="text-muted">${dev.rorg || '-'}</small></td>
+                            <td>${dev.rssi ? dev.rssi + ' dBm' : '-'}</td>
+                            <td><small>${dev.last_seen ? new Date(dev.last_seen).toLocaleTimeString() : '-'}</small></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit(${devJson})">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteDev('${dev.id}')">Del</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        function openEdit(dev) {
+            currentEditDevice = dev;
+            document.getElementById('edit-id').value = dev.id;
+            document.getElementById('edit-id-display').value = dev.id;
+            document.getElementById('edit-name').value = dev.name;
+            document.getElementById('edit-enabled').checked = (dev.enabled !== false);
+            document.getElementById('show-all-profiles').checked = false;
+            
+            populateProfileDropdown();
+            new bootstrap.Modal(document.getElementById('editDeviceModal')).show();
+        }
+
+        function populateProfileDropdown() {
+            const select = document.getElementById('edit-eep');
+            const showAll = document.getElementById('show-all-profiles').checked;
+            const rorg = currentEditDevice.rorg || '';
+            select.innerHTML = '';
+
+            // Filter logic
+            let profiles = allProfiles;
+            if (!showAll && rorg.startsWith('0x')) {
+                const prefix = rorg.replace('0x', '').toUpperCase(); 
+                const matches = allProfiles.filter(p => p.eep.startsWith(prefix));
+                if (matches.length > 0) profiles = matches;
+            }
+
+            if (currentEditDevice.eep === 'pending') select.add(new Option('Select Profile...', '', true, true));
+
+            profiles.forEach(p => {
+                const isSel = p.eep === currentEditDevice.eep;
+                select.add(new Option(`${p.eep} - ${p.title}`, p.eep, false, isSel));
+            });
+            
+            // Add current if missing (legacy support)
+            if (currentEditDevice.eep !== 'pending' && !profiles.find(p => p.eep === currentEditDevice.eep)) {
+                select.add(new Option(`${currentEditDevice.eep} (Current)`, currentEditDevice.eep, false, true));
             }
         }
 
-        function showGatewayInfo() {
-            const infoPanel = document.getElementById('info-panel');
-            const infoTitle = document.getElementById('info-title');
-            const infoContent = document.getElementById('info-content');
+        async function saveDevice() {
+            const id = document.getElementById('edit-id').value;
+            const data = {
+                name: document.getElementById('edit-name').value,
+                eep: document.getElementById('edit-eep').value,
+                enabled: document.getElementById('edit-enabled').checked
+            };
             
-            infoTitle.innerHTML = '<i class="bi bi-hdd-network"></i> Gateway Information';
-            infoContent.innerHTML = `
-                <h5>EnOcean USB Gateway</h5>
-                <table class="table table-sm">
-                    <tr><th>Status:</th><td><span class="badge bg-success">Connected</span></td></tr>
-                    <tr><th>Base ID:</th><td><code id="gateway-base-id">Loading...</code></td></tr>
-                    <tr><th>Version:</th><td><span id="gateway-version">Loading...</span></td></tr>
-                    <tr><th>Chip ID:</th><td><code id="gateway-chip-id">Loading...</code></td></tr>
-                    <tr><th>Description:</th><td><span id="gateway-desc">Loading...</span></td></tr>
-                </table>
-                <p class="text-muted"><small>Check addon logs for detailed gateway information</small></p>
-            `;
-            
-            infoPanel.style.display = 'block';
-            infoPanel.scrollIntoView({ behavior: 'smooth' });
-            
-            // Fetch gateway info from logs or API
-            fetch('/api/gateway-info').then(r => r.json()).then(data => {
-                if (data.base_id) document.getElementById('gateway-base-id').textContent = data.base_id;
-                if (data.version) document.getElementById('gateway-version').textContent = data.version;
-                if (data.chip_id) document.getElementById('gateway-chip-id').textContent = data.chip_id;
-                if (data.description) document.getElementById('gateway-desc').textContent = data.description;
-            }).catch(() => {
-                document.getElementById('gateway-base-id').textContent = 'See addon logs';
-                document.getElementById('gateway-version').textContent = 'See addon logs';
-                document.getElementById('gateway-chip-id').textContent = 'See addon logs';
-                document.getElementById('gateway-desc').textContent = 'See addon logs';
+            if(!data.eep) { alert('Select a profile'); return; }
+
+            await fetch(`/api/devices/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
             });
+            
+            bootstrap.Modal.getInstance(document.getElementById('editDeviceModal')).hide();
+            loadDevices();
         }
 
-        function showEEPProfiles() {
-            const infoPanel = document.getElementById('info-panel');
-            const infoTitle = document.getElementById('info-title');
-            const infoContent = document.getElementById('info-content');
-            
-            infoTitle.innerHTML = '<i class="bi bi-file-earmark-code"></i> EEP Profiles';
-            infoContent.innerHTML = `
-                <h5>Loaded EEP Profiles</h5>
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <strong>MV-01-01</strong> - Kessel Staufix Control
-                        <br><small class="text-muted">Backwater alarm system</small>
-                    </li>
-                </ul>
-                <p class="mt-3 text-muted"><small>More EEP profiles coming in future versions</small></p>
-            `;
-            
-            infoPanel.style.display = 'block';
-            infoPanel.scrollIntoView({ behavior: 'smooth' });
+        async function deleteDev(id) {
+            if(confirm('Delete device?')) {
+                await fetch(`/api/devices/${id}`, { method: 'DELETE' });
+                loadDevices();
+            }
         }
-
-        function showDevices() {
-            const infoPanel = document.getElementById('info-panel');
-            const infoTitle = document.getElementById('info-title');
-            const infoContent = document.getElementById('info-content');
-            
-            infoTitle.innerHTML = '<i class="bi bi-router"></i> Device Management';
-            infoContent.innerHTML = `
-                <h5>Configured Devices</h5>
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> 
-                    <strong>Manual Configuration Required</strong><br>
-                    Create <code>/data/devices.json</code> to add devices.<br>
-                    Web-based device management coming in next version!
-                </div>
-                <h6>Example Configuration:</h6>
-                <pre class="bg-light p-3"><code>{
-  "05834fa4": {
-    "id": "05834fa4",
-    "name": "Staufix Control",
-    "eep": "MV-01-01",
-    "manufacturer": "Kessel",
-    "enabled": true
-  }
-}</code></pre>
-                <p class="text-muted"><small>After creating the file, restart the addon to load devices.</small></p>
-            `;
-            
-            infoPanel.style.display = 'block';
-            infoPanel.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function hideInfoPanel() {
-            document.getElementById('info-panel').style.display = 'none';
-        }
-
-        // Auto-refresh every 30 seconds
-        setInterval(refreshStatus, 30000);
     </script>
 </body>
 </html>

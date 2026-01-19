@@ -7,11 +7,6 @@
   "type_title": "Occupancy with Supply voltage monitor",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ILL",
-      "PIRS",
-      "SVC"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

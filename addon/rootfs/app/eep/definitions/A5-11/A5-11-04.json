@@ -7,9 +7,6 @@
   "type_title": "Extended Light status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ON"
-    ],
     "P1": {
       "type": "state",
       "common": {
@@ -23,7 +20,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "P2": {
       "type": "state",
@@ -38,7 +36,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "P3": {
       "type": "state",
@@ -53,7 +52,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SM": {
       "type": "state",
@@ -68,7 +68,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OHS": {
       "type": "state",
@@ -83,7 +84,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ES": {
       "type": "state",
@@ -104,7 +106,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PM": {
       "type": "state",
@@ -125,7 +128,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

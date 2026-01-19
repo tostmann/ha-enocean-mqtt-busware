@@ -1,116 +1,69 @@
 """
-Service State Manager
-Provides access to service state for web UI
+Service State Singleton
+Shared state between Main Service and Web UI
 """
-import logging
-from typing import Optional, Dict, Any
-
-logger = logging.getLogger(__name__)
-
 
 class ServiceState:
-    """Singleton to hold service state accessible from web UI"""
-    
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(ServiceState, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-    
-    def __init__(self):
-        if self._initialized:
-            return
-        
-        self.service = None
-        self.gateway_info = {} # Fallback / Cache
-        self.detected_profiles = {}
-        self._initialized = True
-    
-    def set_service(self, service):
-        """Set the main service instance"""
-        self.service = service
-        logger.info("Service state manager initialized")
-    
-    def get_status(self) -> Dict[str, Any]:
-        """Get current service status"""
-        if not self.service:
-            return {
-                "status": "initializing",
-                "eep_profiles": 0,
-                "devices": 0,
+            cls._instance.initialized = False
+            cls._instance.status = {
+                "status": "starting",
+                "mqtt_connected": False,
                 "gateway_connected": False,
-                "mqtt_connected": False
+                "devices": 0,
+                "eep_profiles": 0
             }
-        
-        gateway_connected = False
-        if self.service.serial_handler:
-            try:
-                gateway_connected = self.service.serial_handler.is_open()
-            except Exception:
-                gateway_connected = False
+            cls._instance.gateway_info = {}
+            cls._instance._service = None # Reference to main service instance
+            cls._instance.detected_profiles = {} # Cache for teach-in detection
+        return cls._instance
 
-        return {
-            "status": "running" if self.service.running else "stopped",
-            "eep_profiles": len(self.service.eep_loader.profiles) if self.service.eep_loader else 0,
-            "devices": len(self.service.device_manager.list_devices()) if self.service.device_manager else 0,
-            "gateway_connected": gateway_connected,
-            "mqtt_connected": self.service.mqtt_handler.connected if self.service.mqtt_handler else False
-        }
-    
-    def get_gateway_info(self) -> Dict[str, Any]:
-        """Get gateway information (Dynamic fetch from handler)"""
-        # Wenn der Handler verfügbar ist, holen wir die Live-Daten
-        if self.service and self.service.serial_handler:
-            handler = self.service.serial_handler
-            
-            # Base ID aktualisieren falls verfügbar
-            if handler.base_id:
-                self.gateway_info["base_id"] = handler.base_id
-                
-            # Version Info aktualisieren falls verfügbar
-            if handler.version_info:
-                v = handler.version_info
-                self.gateway_info.update({
-                    "version": v.get('app_version', 'Unknown'),
-                    "chip_id": v.get('chip_id', 'Unknown'),
-                    "description": v.get('app_description', '')
-                })
-        
-        return self.gateway_info
-    
-    def set_gateway_info(self, info: Dict[str, Any]):
-        """Set gateway information (Initial setup)"""
+    def set_service(self, service):
+        """Store reference to main service instance"""
+        self._service = service
+
+    def get_service(self):
+        """Get reference to main service instance"""
+        return self._service
+
+    def update_status(self, key, value):
+        self.status[key] = value
+
+    def get_status(self):
+        return self.status
+
+    def set_gateway_info(self, info):
         self.gateway_info = info
-    
-    # ... Rest der Getter Methoden bleibt gleich ...
-    def get_device_manager(self):
-        if self.service and self.service.device_manager:
-            return self.service.device_manager
-        return None
-    
-    def get_eep_loader(self):
-        if self.service and self.service.eep_loader:
-            return self.service.eep_loader
-        return None
-    
-    def get_mqtt_handler(self):
-        if self.service and self.service.mqtt_handler:
-            return self.service.mqtt_handler
-        return None
-    
-    def get_state_persistence(self):
-        if self.service and self.service.state_persistence:
-            return self.service.state_persistence
-        return None
-    
-    def set_detected_profiles(self, device_id: str, profile_eeps: list):
-        self.detected_profiles[device_id] = profile_eeps
-    
-    def get_detected_profiles(self, device_id: str) -> list:
-        return self.detected_profiles.get(device_id, [])
 
+    def get_gateway_info(self):
+        return self.gateway_info
+
+    # Helper methods to access components via service
+    def get_device_manager(self):
+        if self._service:
+            return self._service.device_manager
+        return None
+
+    def get_mqtt_handler(self):
+        if self._service:
+            return self._service.mqtt_handler
+        return None
+
+    def get_eep_loader(self):
+        if self._service:
+            return self._service.eep_loader
+        return None
+    
+    # Teach-in helpers
+    def set_detected_profiles(self, device_id, profiles):
+        self.detected_profiles[device_id] = profiles
+        
+    def get_detected_profiles(self, device_id):
+        return self.detected_profiles.get(device_id, [])
 
 # Global instance
 service_state = ServiceState()

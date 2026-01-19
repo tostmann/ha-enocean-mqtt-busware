@@ -26,7 +26,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "RT": {
       "type": "state",
@@ -42,7 +43,8 @@
         "unit": "100ms",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BS": {
       "type": "state",
@@ -57,7 +59,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

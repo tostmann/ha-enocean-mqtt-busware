@@ -7,13 +7,6 @@
   "type_title": "Switch",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "AI",
-      "A0",
-      "BI",
-      "B0",
-      "REL"
-    ],
     "A0B0": {
       "type": "state",
       "common": {
@@ -27,7 +20,9 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "icon": "mdi:light-switch"
     },
     "AIBI": {
       "type": "state",
@@ -42,7 +37,9 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "icon": "mdi:light-switch"
     },
     "A0BI": {
       "type": "state",
@@ -57,7 +54,9 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "icon": "mdi:light-switch"
     },
     "AIB0": {
       "type": "state",
@@ -72,7 +71,9 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "icon": "mdi:light-switch"
     },
     "rssi": {
       "name": "RSSI",

@@ -7,10 +7,22 @@
   "type_title": "Temperature and humidity Sensor Range 0°C to +40°C and 0% to 100%",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "HUM"
-    ],
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
+    "HUM": {
+      "name": "Humidity",
+      "component": "sensor",
+      "device_class": "humidity",
+      "unit": "%",
+      "icon": "mdi:water-percent",
+      "shortcut": "HUM"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

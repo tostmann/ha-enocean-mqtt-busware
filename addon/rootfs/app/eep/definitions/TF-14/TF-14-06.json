@@ -20,7 +20,9 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "binary_sensor",
+      "icon": "mdi:gesture-tap-button"
     },
     "rssi": {
       "name": "RSSI",

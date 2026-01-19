@@ -7,10 +7,6 @@
   "type_title": "Light Sensor 10-bit measurement (1-Lux resolution) Range 0lx to 1.000lx",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ILL",
-      "SVC"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

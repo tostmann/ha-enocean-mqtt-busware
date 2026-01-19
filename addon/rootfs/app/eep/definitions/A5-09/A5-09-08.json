@@ -7,9 +7,14 @@
   "type_title": "Gas Sensor Pure CO2-Sensor",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "CO2"
-    ],
+    "CO2": {
+      "name": "CO2",
+      "component": "sensor",
+      "device_class": "carbon_dioxide",
+      "unit": "ppm",
+      "icon": "mdi:molecule-co2",
+      "shortcut": "CO2"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

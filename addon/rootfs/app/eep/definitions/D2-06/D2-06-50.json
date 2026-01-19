@@ -24,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AM": {
       "type": "state",
@@ -43,7 +44,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "WDS": {
       "type": "state",
@@ -70,7 +72,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CT": {
       "type": "state",
@@ -85,7 +88,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CB": {
       "type": "state",
@@ -104,7 +108,8 @@
           "1": "Change battery"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BS": {
       "type": "state",
@@ -120,7 +125,8 @@
         "def": 0,
         "unit": "%"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "MOE": {
       "type": "state",
@@ -140,7 +146,8 @@
           "2": "Not Supported"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ACE": {
       "type": "state",
@@ -160,7 +167,8 @@
           "2": "Not Supported"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "MAE": {
       "type": "state",
@@ -180,7 +188,8 @@
           "2": "Not Supported"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SE": {
       "type": "state",
@@ -200,7 +209,8 @@
           "2": "Not Supported"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CS": {
       "type": "state",
@@ -220,7 +230,8 @@
           "2": "Invalid"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CAL": {
       "type": "state",
@@ -248,7 +259,8 @@
           "10": "Frame Magnet Validation"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

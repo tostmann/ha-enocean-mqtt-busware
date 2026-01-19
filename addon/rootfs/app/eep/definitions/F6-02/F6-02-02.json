@@ -7,12 +7,6 @@
   "type_title": "Switch",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "AI",
-      "A0",
-      "BI",
-      "B0"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

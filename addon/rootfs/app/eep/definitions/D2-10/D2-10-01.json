@@ -31,7 +31,8 @@
           "de": "Einen Befehl an das Gerät senden."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "communication.MID": {
       "type": "state",
@@ -57,7 +58,8 @@
           "de": "Definiert den Typ der Nachricht."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "communication.MCF": {
       "type": "state",
@@ -81,7 +83,8 @@
           "de": "Gibt an ob ein weiteres Telegramm erwartet wird oder ob das Telegramm komplett ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "communication.IRC": {
       "type": "state",
@@ -107,7 +110,8 @@
           "de": "Definiert den Typ der Informationsanfrage."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "communication.FBC": {
       "type": "state",
@@ -131,7 +135,8 @@
           "de": "Definiert den Typ des Feedback"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "communication.GMT": {
       "type": "state",
@@ -154,7 +159,8 @@
           "de": "Gibt an ob die generelle Nachricht ein Feedback oder eine Informationsanfrage ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.CW1": {
       "type": "state",
@@ -173,7 +179,8 @@
           "de": "Flag für eine spezifische Anwendungswarnung."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.CW2": {
       "type": "state",
@@ -192,7 +199,8 @@
           "de": "Flag für eine spezifische Anwendungswarnung."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.WOD": {
       "type": "state",
@@ -216,7 +224,8 @@
           "de": "Gibt an ob ein offenes Fenster erkannt wird."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.BS": {
       "type": "state",
@@ -241,7 +250,8 @@
           "de": "Representiert den Batteriestatus."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.OBS": {
       "type": "state",
@@ -265,7 +275,8 @@
           "de": "Gibt an ob der Belegungsschalter gedrückt wurde und seinen Belegungsstatus."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.RCM": {
       "type": "state",
@@ -290,7 +301,8 @@
           "de": "Gibt an ob der Belegungsschalter gedrückt wurde und seinen Belegungsstatus."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.SPV": {
       "type": "state",
@@ -313,7 +325,8 @@
           "de": "Gibt an ob der Temperatur-Sollwert gültig ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.TPV": {
       "type": "state",
@@ -336,7 +349,8 @@
           "de": "Gibt an ob der Temperatur Wert gültig ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.TSP": {
       "type": "state",
@@ -357,7 +371,8 @@
           "de": "Aktueller Temperatur-Sollwert."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "data.TMP": {
       "type": "state",
@@ -379,7 +394,8 @@
           "de": "Aktuelle Raumtemperatur."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.TSL": {
       "type": "state",
@@ -402,7 +418,8 @@
           "de": "Gibt an ob die Temperatur-Skala am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DCL": {
       "type": "state",
@@ -425,7 +442,8 @@
           "de": "Gibt an ob der Display-Inhalt am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DTL": {
       "type": "state",
@@ -448,7 +466,8 @@
           "de": "Gibt an ob das Datum und die Zeit am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.TPL": {
       "type": "state",
@@ -471,7 +490,8 @@
           "de": "Gibt an ob das Zeitprogramm am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.OBL": {
       "type": "state",
@@ -494,7 +514,8 @@
           "de": "Gibt an ob der Belegungsstatus am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.SPL": {
       "type": "state",
@@ -517,7 +538,8 @@
           "de": "Gibt an ob der Temperatur-Sollwert am Raumbedienungsgerät geändert werden kann."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.RCI": {
       "type": "state",
@@ -543,7 +565,8 @@
           "de": "Definiert die längste Zeit zwischen zwei Radio-Telegrammen (Zeit basierte Kommunikation)."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.KL": {
       "type": "state",
@@ -566,7 +589,8 @@
           "de": "Gibt an ob alle Tasten des Gerätes gesperrt sind."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DC": {
       "type": "state",
@@ -595,7 +619,8 @@
           "de": "Definiert den Haupt-Display-Inhalt."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.TS": {
       "type": "state",
@@ -620,7 +645,8 @@
           "de": "Definiert die Temperatur-Einheit für das Raumbedienungsgerät und die Menüs."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DST": {
       "type": "state",
@@ -643,7 +669,8 @@
           "de": "Gibt an ob das Gerät die Sommerzeit unterstützt."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.TN": {
       "type": "state",
@@ -668,7 +695,8 @@
           "de": "Definiert die verwendete Zeit-Notation."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DAY": {
       "type": "state",
@@ -689,7 +717,8 @@
           "de": "Datumsformat: JJJJ/MM/TT"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.MON": {
       "type": "state",
@@ -710,7 +739,8 @@
           "de": "Datumsformat: JJJJ/MM/TT"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.YR": {
       "type": "state",
@@ -731,7 +761,8 @@
           "de": "Datumsformat: JJJJ/MM/TT"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.MIN": {
       "type": "state",
@@ -753,7 +784,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.HR": {
       "type": "state",
@@ -775,7 +807,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "config.DTU": {
       "type": "state",
@@ -798,7 +831,8 @@
           "de": "Definiert ob ein Update von Datum oder Zeit gegeben wird."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SPB": {
       "type": "state",
@@ -820,7 +854,8 @@
           "de": "Temperatur-Sollwert zum Gebäude schutz."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SPE": {
       "type": "state",
@@ -842,7 +877,8 @@
           "de": "Temperatur-Sollwert im Sparmodus."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SPC": {
       "type": "state",
@@ -864,7 +900,8 @@
           "de": "Temperatur-Sollwert im Komfortmodus."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SFB": {
       "type": "state",
@@ -887,7 +924,8 @@
           "de": "Zeigt an ob ein Temperatur-Sollwert für den Gebäude Schutzmodus gesetzt ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SFE": {
       "type": "state",
@@ -910,7 +948,8 @@
           "de": "Zeigt an ob ein Temperatur-Sollwert für den Sparmodus gesetzt ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "room_control_setup.SFC": {
       "type": "state",
@@ -933,7 +972,8 @@
           "de": "Zeigt an ob ein Temperatur-Sollwert für den Komfortmodus gesetzt ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.ETM": {
       "type": "state",
@@ -955,7 +995,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.ETH": {
       "type": "state",
@@ -977,7 +1018,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.STM": {
       "type": "state",
@@ -999,7 +1041,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.STH": {
       "type": "state",
@@ -1021,7 +1064,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.PER": {
       "type": "state",
@@ -1058,7 +1102,8 @@
           "de": "Zeitformat: HH:MM"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.RCM": {
       "type": "state",
@@ -1083,7 +1128,8 @@
           "de": "Zugewiesener Raumsteuerungsmodus für die angegebene Zeit."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "time_program_setup.TPD": {
       "type": "state",
@@ -1106,7 +1152,8 @@
           "de": "Löscht das gespeicherte Zeitprogramm."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

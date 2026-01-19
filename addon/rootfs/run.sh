@@ -1,5 +1,19 @@
 #!/usr/bin/with-contenv bashio
 
+# --- MQTT CHECK ---
+if ! bashio::services.available "mqtt"; then
+    bashio::log.fatal "#######################################################"
+    bashio::log.fatal "# KRITISCHER FEHLER: KEIN MQTT SERVICE GEFUNDEN!      #"
+    bashio::log.fatal "#                                                     #"
+    bashio::log.fatal "# Dieses Add-on benötigt zwingend einen MQTT Broker.  #"
+    bashio::log.fatal "# Bitte installiere das 'Mosquitto broker' Add-on     #"
+    bashio::log.fatal "# im Home Assistant Add-on Store.                     #"
+    bashio::log.fatal "#######################################################"
+    # Wir beenden das Add-on sofort, da es ohne MQTT sinnlos ist
+    bashio::exit.nok
+fi
+# ------------------
+
 # Configuration loading with priority logic
 TCP_ADDR=$(bashio::config 'tcp_address')
 SERIAL_DEV=$(bashio::config 'serial_device')

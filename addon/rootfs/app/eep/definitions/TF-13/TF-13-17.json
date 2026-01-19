@@ -20,7 +20,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CH2": {
       "type": "state",
@@ -35,7 +36,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

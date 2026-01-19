@@ -7,10 +7,6 @@
   "type_title": "Room Operating Panel",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "SP"
-    ],
     "BATT": {
       "type": "state",
       "common": {
@@ -24,7 +20,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ACT": {
       "type": "state",
@@ -39,7 +36,16 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
     },
     "rssi": {
       "name": "RSSI",

@@ -7,10 +7,6 @@
   "type_title": "Heating Radiator Valve Actuating Drive",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "in",
-      "in.CV"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -31,7 +27,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.TMP": {
       "type": "state",
@@ -47,7 +44,8 @@
         "def": 0,
         "unit": "°C"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.RTMP": {
       "type": "state",
@@ -63,7 +61,8 @@
         "def": 10,
         "unit": "°C"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.FC": {
       "type": "state",
@@ -78,7 +77,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.MST": {
       "type": "state",
@@ -93,7 +93,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.BLS": {
       "type": "state",
@@ -108,7 +109,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.TS": {
       "type": "state",
@@ -127,7 +129,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "POS": {
       "type": "state",
@@ -142,7 +145,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "MC": {
       "type": "state",
@@ -157,7 +161,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "WUC": {
       "type": "state",
@@ -238,7 +243,8 @@
         },
         "def": 19
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DSO": {
       "type": "state",
@@ -259,7 +265,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BLC": {
       "type": "state",
@@ -274,7 +281,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "TSP": {
       "type": "state",
@@ -289,7 +297,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

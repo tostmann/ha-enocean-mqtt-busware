@@ -25,7 +25,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OV": {
       "type": "state",
@@ -40,7 +41,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

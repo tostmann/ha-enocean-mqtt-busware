@@ -7,9 +7,14 @@
   "type_title": "Temperature Sensor Range +40°C to +120°C",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP"
-    ],
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

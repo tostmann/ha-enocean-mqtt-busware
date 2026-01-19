@@ -7,12 +7,6 @@
   "type_title": "Harvesting-powered actuator with local temperature offset control (BI-DIR)",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "in",
-      "in.CV",
-      "in.TMP",
-      "in.DWO"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -31,7 +25,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.LOM": {
       "type": "state",
@@ -50,7 +45,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.LO": {
       "type": "state",
@@ -66,7 +62,8 @@
         "def": 0,
         "unit": "°C"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.TSL": {
       "type": "state",
@@ -85,7 +82,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.ENIE": {
       "type": "state",
@@ -100,7 +98,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.ES": {
       "type": "state",
@@ -119,7 +118,8 @@
         },
         "def": 1
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.RCE": {
       "type": "state",
@@ -134,7 +134,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.RSS": {
       "type": "state",
@@ -149,7 +150,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.ACO": {
       "type": "state",
@@ -164,7 +166,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SP": {
       "type": "state",
@@ -179,7 +182,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "TMP": {
       "type": "state",
@@ -195,7 +199,11 @@
         "def": 0,
         "unit": "°C"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer"
     },
     "rssi": {
       "name": "RSSI",

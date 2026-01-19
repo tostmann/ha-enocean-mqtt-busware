@@ -7,9 +7,6 @@
   "type_title": "Dimmer status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ON"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

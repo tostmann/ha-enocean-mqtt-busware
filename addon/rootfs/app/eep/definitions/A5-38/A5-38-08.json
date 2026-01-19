@@ -29,7 +29,8 @@
         },
         "def": 1
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "switching": {
       "type": "channel",
@@ -39,7 +40,10 @@
           "de": "Schalten"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "switch",
+      "icon": "mdi:gesture-tap-button",
+      "device_class": "outlet"
     },
     "switching.TIM": {
       "type": "state",
@@ -57,7 +61,10 @@
         "max": 6553.5,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "switch",
+      "icon": "mdi:gesture-tap-button",
+      "device_class": "outlet"
     },
     "switching.LCK": {
       "type": "state",
@@ -72,7 +79,10 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "switch",
+      "icon": "mdi:gesture-tap-button",
+      "device_class": "outlet"
     },
     "switching.DEL": {
       "type": "state",
@@ -91,7 +101,10 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "switch",
+      "icon": "mdi:gesture-tap-button",
+      "device_class": "outlet"
     },
     "switching.SW": {
       "type": "state",
@@ -106,7 +119,10 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "switch",
+      "icon": "mdi:gesture-tap-button",
+      "device_class": "outlet"
     },
     "dimming": {
       "type": "channel",
@@ -116,7 +132,8 @@
           "de": "Dimmen"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dimming.EDIM": {
       "type": "state",
@@ -134,7 +151,8 @@
         "max": 100,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dimming.RMP": {
       "type": "state",
@@ -152,7 +170,8 @@
         "max": 255,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dimming.EDIMR": {
       "type": "state",
@@ -171,7 +190,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dimming.STR": {
       "type": "state",
@@ -186,7 +206,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dimming.SW": {
       "type": "state",
@@ -201,7 +222,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "setpoint": {
       "type": "channel",
@@ -211,7 +233,8 @@
           "de": "Sollwert"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "setpoint.SP": {
       "type": "state",
@@ -229,7 +252,8 @@
         "max": 12.8,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "setpoint.BSP": {
       "type": "state",
@@ -247,7 +271,8 @@
         "max": 51.2,
         "def": 1
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable": {
       "type": "channel",
@@ -257,7 +282,8 @@
           "de": "Überschreiben der Regelgröße"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable.CVOV": {
       "type": "state",
@@ -275,7 +301,8 @@
         "max": 100,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable.CM": {
       "type": "state",
@@ -296,7 +323,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable.CS": {
       "type": "state",
@@ -315,7 +343,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable.ENHO": {
       "type": "state",
@@ -334,7 +363,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "control_variable.RMOCC": {
       "type": "state",
@@ -354,7 +384,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

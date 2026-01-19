@@ -7,9 +7,6 @@
   "type_title": "Dimmer status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ON"
-    ],
     "LVL": {
       "type": "state",
       "common": {
@@ -24,7 +21,8 @@
         "unit": "%",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

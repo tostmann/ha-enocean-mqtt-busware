@@ -29,7 +29,8 @@
         },
         "def": 1
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "POS": {
       "type": "state",
@@ -48,7 +49,8 @@
         "def": 0,
         "unit": "%"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ANG": {
       "type": "state",
@@ -67,7 +69,8 @@
         "def": 0,
         "unit": "%"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "REPO": {
       "type": "state",
@@ -87,7 +90,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "LOCK": {
       "type": "state",
@@ -108,7 +112,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CHN": {
       "type": "state",
@@ -130,7 +135,8 @@
         },
         "def": 15
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "VERT": {
       "type": "state",
@@ -148,7 +154,8 @@
         },
         "def": 32767
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ROT": {
       "type": "state",
@@ -167,7 +174,8 @@
         },
         "def": 255
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AA": {
       "type": "state",
@@ -189,7 +197,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

@@ -20,7 +20,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "VOC_ID": {
       "type": "state",
@@ -73,7 +74,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "UN": {
       "type": "state",
@@ -92,7 +94,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

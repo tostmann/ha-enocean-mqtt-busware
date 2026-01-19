@@ -7,9 +7,6 @@
   "type_title": "Multi-Func Sensor Window/Door with Supply Voltage monitor and Vibration detection",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SVC"
-    ],
     "VIB": {
       "type": "state",
       "common": {
@@ -27,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CT": {
       "type": "state",
@@ -47,7 +45,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

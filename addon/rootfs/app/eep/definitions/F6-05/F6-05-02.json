@@ -24,7 +24,8 @@
           "de": "Zeigt true an wenn Rauch erkannt wurde."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BATT": {
       "type": "state",
@@ -43,7 +44,8 @@
           "de": "Zeigt true an wenn die Batterie schwach ist."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

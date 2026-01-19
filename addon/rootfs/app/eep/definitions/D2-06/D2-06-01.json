@@ -7,11 +7,6 @@
   "type_title": "Multisensor Window Handle",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "HUM",
-      "ILL"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -30,7 +25,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BAL": {
       "type": "state",
@@ -51,7 +47,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PPAL": {
       "type": "state",
@@ -72,7 +69,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "HP": {
       "type": "state",
@@ -96,7 +94,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "WS": {
       "type": "state",
@@ -118,7 +117,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BR": {
       "type": "state",
@@ -140,7 +140,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BL": {
       "type": "state",
@@ -162,7 +163,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "M": {
       "type": "state",
@@ -183,7 +185,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "V": {
       "type": "state",
@@ -205,7 +208,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BS": {
       "type": "state",
@@ -221,7 +225,8 @@
         "def": 0,
         "unit": "%"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "conf.VM": {
       "type": "state",
@@ -236,7 +241,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "conf.HCC": {
       "type": "state",
@@ -251,7 +257,8 @@
         "write": true,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "conf.BLC": {
       "type": "state",
@@ -266,7 +273,8 @@
         "write": true,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "conf.SUI": {
       "type": "state",
@@ -284,7 +292,8 @@
         "def": 5,
         "unit": "s"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "conf.VBI": {
       "type": "state",
@@ -302,7 +311,8 @@
         "def": 3,
         "unit": "s"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.PON": {
       "type": "state",
@@ -317,7 +327,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.ALL": {
       "type": "state",
@@ -332,7 +343,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.HMC": {
       "type": "state",
@@ -347,7 +359,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.HMO": {
       "type": "state",
@@ -362,7 +375,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.HMT": {
       "type": "state",
@@ -377,7 +391,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.WT": {
       "type": "state",
@@ -392,7 +407,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.BRP": {
       "type": "state",
@@ -407,7 +423,8 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "log.BLP": {
       "type": "state",
@@ -422,7 +439,24 @@
         "write": true,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
+    "HUM": {
+      "name": "Humidity",
+      "component": "sensor",
+      "device_class": "humidity",
+      "unit": "%",
+      "icon": "mdi:water-percent",
+      "shortcut": "HUM"
     },
     "rssi": {
       "name": "RSSI",

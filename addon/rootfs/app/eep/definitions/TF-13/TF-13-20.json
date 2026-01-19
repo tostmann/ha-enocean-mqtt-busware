@@ -7,10 +7,6 @@
   "type_title": "FTRx5HS, FTAFx5D",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SP",
-      "TMP"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -28,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "NR": {
       "type": "state",
@@ -44,7 +41,8 @@
         "def": 0,
         "unit": "°K"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SPRI": {
       "type": "state",
@@ -59,7 +57,16 @@
         "write": true,
         "def": true
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
     },
     "rssi": {
       "name": "RSSI",

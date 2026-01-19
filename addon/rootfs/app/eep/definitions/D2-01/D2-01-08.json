@@ -7,15 +7,6 @@
   "type_title": "Electronic switch with energy measurement and local control",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "RM",
-      "ep",
-      "MAT",
-      "MIT",
-      "qu",
-      "EC",
-      "AC"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -38,7 +29,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "de": {
       "type": "state",
@@ -57,7 +49,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OC": {
       "type": "state",
@@ -76,7 +69,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "RO": {
       "type": "state",
@@ -95,7 +89,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "LC": {
       "type": "state",
@@ -114,7 +109,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "dn": {
       "type": "state",
@@ -133,7 +129,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DS": {
       "type": "state",
@@ -153,7 +150,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OV": {
       "type": "state",
@@ -168,7 +166,8 @@
         "write": true,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "EL": {
       "type": "state",
@@ -189,7 +188,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "UN": {
       "type": "state",
@@ -211,7 +211,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

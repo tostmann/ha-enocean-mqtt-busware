@@ -7,10 +7,6 @@
   "type_title": "Light Sensor Range 0lx to 1.020lx",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ILL",
-      "SVC"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

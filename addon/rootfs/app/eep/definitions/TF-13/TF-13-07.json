@@ -29,7 +29,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "LVL": {
       "type": "state",
@@ -45,7 +46,8 @@
         "unit": "%",
         "def": 100
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DS": {
       "type": "state",
@@ -63,7 +65,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BL": {
       "type": "state",
@@ -82,7 +85,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

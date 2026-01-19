@@ -26,7 +26,11 @@
           "1023": "Error"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer"
     },
     "HM": {
       "type": "state",
@@ -46,7 +50,8 @@
           "255": "Not Supported"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ILL": {
       "type": "state",
@@ -65,7 +70,8 @@
           "131071": "Error"
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ASS": {
       "type": "state",
@@ -85,7 +91,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "X": {
       "type": "state",
@@ -105,7 +112,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "Y": {
       "type": "state",
@@ -125,7 +133,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "Z": {
       "type": "state",
@@ -145,7 +154,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CO": {
       "type": "state",
@@ -160,7 +170,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

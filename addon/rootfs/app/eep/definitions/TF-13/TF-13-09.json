@@ -7,9 +7,6 @@
   "type_title": "FRW",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "AL"
-    ],
     "BL": {
       "type": "state",
       "common": {
@@ -23,7 +20,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

@@ -7,9 +7,6 @@
   "type_title": "Dual-door-contact with States Open/Closed and Locked/Unlocked, Supply voltage monitor",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SVC"
-    ],
     "LCT": {
       "type": "state",
       "common": {
@@ -27,7 +24,8 @@
         },
         "def": "0"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DCT": {
       "type": "state",
@@ -46,7 +44,8 @@
         },
         "def": "0"
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

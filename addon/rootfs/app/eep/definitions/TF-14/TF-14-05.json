@@ -7,9 +7,6 @@
   "type_title": "F4HK14 Heating/Cooling actuator",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "SP"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -27,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "PRI": {
       "type": "state",
@@ -47,7 +45,8 @@
         },
         "def": 13
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

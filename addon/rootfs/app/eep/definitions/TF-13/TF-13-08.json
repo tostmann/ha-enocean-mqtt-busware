@@ -7,9 +7,6 @@
   "type_title": "FTKB Battery status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SVC"
-    ],
     "ES": {
       "type": "state",
       "common": {
@@ -24,7 +21,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

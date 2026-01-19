@@ -7,9 +7,6 @@
   "type_title": "Multi-Func Sensor Window/Door with states Open/Closed/Tilt, supply voltage monitor",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SVC"
-    ],
     "OP": {
       "type": "state",
       "common": {
@@ -23,7 +20,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "TL": {
       "type": "state",
@@ -38,7 +36,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

@@ -24,7 +24,8 @@
           "de": "Wird nur gesetzt, wenn der Aktor die volle Zeit, die auf dem Aktor selbst eingestellt ist, durchgelaufen ist. Wird der Aktor vor Ablauf der vollen Zeit gestoppt, wird dieser Zustand nicht gesetzt."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "BOT": {
       "type": "state",
@@ -43,7 +44,8 @@
           "de": "Wird nur gesetzt, wenn der Aktor die volle Zeit, die auf dem Aktor selbst eingestellt ist, durchgelaufen ist. Wird der Aktor vor Ablauf der vollen Zeit gestoppt, wird dieser Zustand nicht gesetzt."
         }
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "UP": {
       "type": "state",
@@ -58,7 +60,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DO": {
       "type": "state",
@@ -73,7 +76,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

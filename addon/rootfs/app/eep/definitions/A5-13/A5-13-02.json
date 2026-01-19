@@ -7,11 +7,6 @@
   "type_title": "Sun Intensity",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SNW",
-      "SNS",
-      "SNE"
-    ],
     "HEM": {
       "type": "state",
       "common": {
@@ -29,7 +24,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

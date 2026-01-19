@@ -7,9 +7,6 @@
   "type_title": "Brightness sensor 0-50 Lux & 300-30000 Lux",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "ILL"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

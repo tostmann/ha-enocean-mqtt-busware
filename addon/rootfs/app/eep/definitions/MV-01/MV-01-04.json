@@ -7,11 +7,6 @@
   "type_title": "Oventrop R-Tronic RTB A5-10-06",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "SP",
-      "SLSW"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -29,7 +24,16 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
     },
     "rssi": {
       "name": "RSSI",

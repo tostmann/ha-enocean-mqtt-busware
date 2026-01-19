@@ -7,14 +7,6 @@
   "type_title": "FWS61",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "RAN",
-      "WND",
-      "SNW",
-      "SNS",
-      "SNE"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -31,7 +23,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DWS": {
       "type": "state",
@@ -47,7 +40,24 @@
         "unit": "lx",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
+    },
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
+    "WND": {
+      "name": "Wind Speed",
+      "component": "sensor",
+      "device_class": "wind_speed",
+      "unit": "m/s",
+      "icon": "mdi:weather-windy",
+      "shortcut": "WND"
     },
     "rssi": {
       "name": "RSSI",

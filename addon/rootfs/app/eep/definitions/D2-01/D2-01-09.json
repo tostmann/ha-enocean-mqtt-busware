@@ -7,15 +7,6 @@
   "type_title": "Electronic switch with energy measurement and local control",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "RM",
-      "ep",
-      "MAT",
-      "MIT",
-      "qu",
-      "EC",
-      "AC"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -38,7 +29,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DV": {
       "type": "state",
@@ -60,7 +52,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OV": {
       "type": "state",
@@ -77,7 +70,8 @@
         "max": 100,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "de": {
       "type": "state",
@@ -96,7 +90,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "RO": {
       "type": "state",
@@ -115,7 +110,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DT1": {
       "type": "state",
@@ -133,7 +129,8 @@
         "def": 0.5,
         "step": 0.5
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DT2": {
       "type": "state",
@@ -151,7 +148,8 @@
         "def": 0.5,
         "step": 0.5
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DT3": {
       "type": "state",
@@ -169,7 +167,8 @@
         "def": 0.5,
         "step": 0.5
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DS": {
       "type": "state",
@@ -189,7 +188,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "EL": {
       "type": "state",
@@ -210,7 +210,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "UN": {
       "type": "state",
@@ -232,7 +233,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

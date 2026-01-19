@@ -7,10 +7,6 @@
   "type_title": "Nodon SIN-2-2-01 2 channel state",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "CH1",
-      "CH2"
-    ],
     "CH1.ON": {
       "type": "state",
       "common": {
@@ -24,7 +20,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "CH2.ON": {
       "type": "state",
@@ -39,7 +36,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

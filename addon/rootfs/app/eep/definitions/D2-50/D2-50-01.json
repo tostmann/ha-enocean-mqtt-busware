@@ -7,9 +7,6 @@
   "type_title": "Heat Recovery Ventilation with pre-heater",
   "bidirectional": true,
   "objects": {
-    "preDefined": [
-      "in"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -29,7 +26,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "RMT": {
       "type": "state",
@@ -48,7 +46,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "DOMC": {
       "type": "state",
@@ -75,7 +74,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "OMC": {
       "type": "state",
@@ -95,7 +95,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "COT": {
       "type": "state",
@@ -114,7 +115,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "HT": {
       "type": "state",
@@ -133,7 +135,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AQT": {
       "type": "state",
@@ -152,7 +155,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.OMS": {
       "type": "state",
@@ -178,7 +182,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.SFP": {
       "type": "state",
@@ -197,7 +202,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.EFP": {
       "type": "state",
@@ -216,7 +222,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.DMS": {
       "type": "state",
@@ -235,7 +242,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.CPS": {
       "type": "state",
@@ -254,7 +262,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.OHS": {
       "type": "state",
@@ -273,7 +282,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.DHS": {
       "type": "state",
@@ -292,7 +302,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.TOMS": {
       "type": "state",
@@ -311,7 +322,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.FMS": {
       "type": "state",
@@ -330,7 +342,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.AQS1": {
       "type": "state",
@@ -349,7 +362,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.MSS": {
       "type": "state",
@@ -368,7 +382,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.OUTT": {
       "type": "state",
@@ -384,7 +399,8 @@
         "unit": "°C",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.SPLYT": {
       "type": "state",
@@ -400,7 +416,8 @@
         "unit": "°C",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.SPLYFF": {
       "type": "state",
@@ -416,7 +433,8 @@
         "unit": "m³/h",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.EXHFF": {
       "type": "state",
@@ -432,7 +450,8 @@
         "unit": "m³/h",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.SPLYFS": {
       "type": "state",
@@ -448,7 +467,8 @@
         "unit": "1/min",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.EXHFS": {
       "type": "state",
@@ -464,7 +484,8 @@
         "unit": "1/min",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.SVI": {
       "type": "state",
@@ -479,7 +500,8 @@
         "write": false,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.OHC": {
       "type": "state",
@@ -495,7 +517,8 @@
         "unit": "h",
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.IMS": {
       "type": "state",
@@ -528,7 +551,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "in.FS": {
       "type": "state",
@@ -577,7 +601,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

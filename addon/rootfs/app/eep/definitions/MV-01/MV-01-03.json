@@ -7,9 +7,6 @@
   "type_title": "PEHA 452 FU-EBIM JR o.T. Blind control and status",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "POS"
-    ],
     "CMD": {
       "type": "state",
       "common": {
@@ -31,7 +28,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "AN": {
       "type": "state",
@@ -49,7 +47,8 @@
         "max": 180,
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ES": {
       "type": "state",
@@ -70,7 +69,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "EP": {
       "type": "state",
@@ -91,7 +91,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "ST": {
       "type": "state",
@@ -112,7 +113,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "SM": {
       "type": "state",
@@ -127,7 +129,8 @@
         "write": false,
         "def": false
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "MOTP": {
       "type": "state",
@@ -146,7 +149,8 @@
         },
         "def": 0
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",

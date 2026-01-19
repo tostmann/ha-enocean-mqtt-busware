@@ -7,11 +7,14 @@
   "type_title": "Room Operating Panel Temperature, Set point, Day/Night Control",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "TMP",
-      "SP",
-      "SLSW"
-    ],
+    "TMP": {
+      "name": "Temperature",
+      "component": "sensor",
+      "device_class": "temperature",
+      "unit": "°C",
+      "icon": "mdi:thermometer",
+      "shortcut": "TMP"
+    },
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

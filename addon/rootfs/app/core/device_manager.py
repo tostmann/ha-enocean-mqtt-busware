@@ -1,206 +1,96 @@
-"""
-Device Manager
-Manages EnOcean devices and their configuration
-"""
 import json
+import os
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-
 class DeviceManager:
-    """Manage EnOcean devices"""
-    
-    def __init__(self, data_file: str = '/data/devices.json'):
-        """
-        Initialize device manager
-        
-        Args:
-            data_file: Path to devices data file
-        """
-        self.data_file = Path(data_file)
-        self.devices: Dict[str, dict] = {}
-        self.load_devices()
-    
-    @staticmethod
-    def normalize_device_id(device_id: str) -> str:
-        """
-        Normalize device ID to lowercase 8-char hex without prefix
-        
-        Args:
-            device_id: Device ID in any format (0xABC123, ABC123, abc123)
-            
-        Returns:
-            Normalized lowercase hex string without 0x prefix
-        """
-        # Remove 0x prefix if present
-        if device_id.lower().startswith('0x'):
-            device_id = device_id[2:]
-        # Convert to lowercase
-        return device_id.lower()
-    
-    def load_devices(self):
-        """Load devices from file"""
-        try:
-            if self.data_file.exists():
-                with open(self.data_file, 'r') as f:
-                    raw_devices = json.load(f)
-                
-                # Normalize all device IDs on load (handles legacy uppercase/0x prefixed IDs)
-                self.devices = {}
-                for device_id, device_data in raw_devices.items():
-                    normalized_id = self.normalize_device_id(device_id)
-                    device_data['id'] = normalized_id  # Update stored ID too
-                    self.devices[normalized_id] = device_data
-                
-                logger.info(f"Loaded {len(self.devices)} devices from {self.data_file}")
+    def __init__(self, storage_path=None):
+        # Intelligente Pfad-Ermittlung
+        if storage_path:
+            self.storage_path = storage_path
+        else:
+            # Wenn wir im Home Assistant Addon sind, existiert /data
+            if os.path.exists('/data') and os.access('/data', os.W_OK):
+                self.storage_path = '/data/devices.json'
             else:
-                logger.info("No existing devices file, starting fresh")
+                # Fallback für lokale Entwicklung (damit keine Permission Errors kommen)
+                self.storage_path = os.path.join(os.getcwd(), 'devices.json')
+                logger.info(f"Running locally. Using storage path: {self.storage_path}")
+
+        self.devices = {}
+        self.load_devices()
+
+    def load_devices(self):
+        if os.path.exists(self.storage_path):
+            try:
+                with open(self.storage_path, 'r') as f:
+                    self.devices = json.load(f)
+            except Exception as e:
+                logger.error(f"Error loading devices from {self.storage_path}: {e}")
                 self.devices = {}
-        except Exception as e:
-            logger.error(f"Error loading devices: {e}")
+        else:
             self.devices = {}
-    
+
     def save_devices(self):
-        """Save devices to file"""
         try:
-            # Ensure data directory exists
-            self.data_file.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(self.data_file, 'w') as f:
+            # Sicherstellen, dass das Verzeichnis existiert
+            directory = os.path.dirname(self.storage_path)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory, exist_ok=True)
+                
+            with open(self.storage_path, 'w') as f:
                 json.dump(self.devices, f, indent=2)
-            logger.debug(f"Saved {len(self.devices)} devices to {self.data_file}")
+            # logger.info(f"Devices saved to {self.storage_path}") # Debug level, sonst Spam
         except Exception as e:
-            logger.error(f"Error saving devices: {e}")
-    
-    def add_device(self, device_id: str, name: str, eep: str, manufacturer: str = "EnOcean") -> bool:
-        """
-        Add a new device
-        
-        Args:
-            device_id: Device ID (sender ID)
-            name: Device name
-            eep: EEP profile code
-            manufacturer: Manufacturer name
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        try:
-            # Normalize device ID to lowercase without 0x prefix
-            device_id = self.normalize_device_id(device_id)
-            self.devices[device_id] = {
-                'id': device_id,
-                'name': name,
-                'eep': eep,
-                'manufacturer': manufacturer,
-                'enabled': True,
-                'created_at': datetime.now().isoformat(),
-                'last_seen': None,
-                'rssi': None
-            }
-            self.save_devices()
-            logger.info(f"Added device: {device_id} ({name})")
-            return True
-        except Exception as e:
-            logger.error(f"Error adding device: {e}")
-            return False
-    
-    def get_device(self, device_id: str) -> Optional[dict]:
-        """
-        Get device by ID
-        
-        Args:
-            device_id: Device ID (accepts any format: 0xABC123, ABC123, abc123)
-            
-        Returns:
-            Device dict if found, None otherwise
-        """
-        # Normalize device ID for lookup
-        device_id = self.normalize_device_id(device_id)
-        return self.devices.get(device_id)
-    
-    def list_devices(self) -> List[dict]:
-        """
-        List all devices
-        
-        Returns:
-            List of device dicts
-        """
+            logger.error(f"Error saving devices to {self.storage_path}: {e}")
+
+    def list_devices(self):
         return list(self.devices.values())
-    
-    def update_last_seen(self, device_id: str, rssi: int = None):
-        """
-        Update device last seen timestamp
+
+    def get_device(self, device_id):
+        return self.devices.get(device_id)
+
+    def add_device(self, device_id, name, eep, manufacturer="EnOcean"):
+        # Verhindern, dass wir existierende (konfigurierte) Geräte überschreiben
+        if device_id in self.devices and self.devices[device_id].get('eep') != 'pending':
+            return False
+            
+        self.devices[device_id] = {
+            "id": device_id,
+            "name": name,
+            "eep": eep,
+            "manufacturer": manufacturer,
+            "enabled": True
+        }
+        self.save_devices()
+        return True
+
+    def update_device(self, device_id, data):
+        """Update existing device configuration"""
+        if device_id not in self.devices:
+            return False
+            
+        device = self.devices[device_id]
         
-        Args:
-            device_id: Device ID
-            rssi: RSSI value (optional)
-        """
-        device_id = self.normalize_device_id(device_id)
+        # Felder aktualisieren
+        if 'name' in data: device['name'] = data['name']
+        if 'eep' in data: device['eep'] = data['eep']
+        if 'manufacturer' in data: device['manufacturer'] = data['manufacturer']
+        if 'enabled' in data: device['enabled'] = data['enabled']
+        if 'rorg' in data: device['rorg'] = data['rorg']
+        
+        self.save_devices()
+        return True
+
+    def remove_device(self, device_id):
         if device_id in self.devices:
-            self.devices[device_id]['last_seen'] = datetime.now().isoformat()
-            if rssi is not None:
-                self.devices[device_id]['rssi'] = rssi
+            del self.devices[device_id]
             self.save_devices()
-    
-    def remove_device(self, device_id: str) -> bool:
-        """
-        Remove a device
+            return True
+        return False
         
-        Args:
-            device_id: Device ID
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        try:
-            device_id = self.normalize_device_id(device_id)
-            if device_id in self.devices:
-                del self.devices[device_id]
-                self.save_devices()
-                logger.info(f"Removed device: {device_id}")
-                return True
-            return False
-        except Exception as e:
-            logger.error(f"Error removing device: {e}")
-            return False
-    
-    def enable_device(self, device_id: str, enabled: bool = True) -> bool:
-        """
-        Enable or disable a device
-        
-        Args:
-            device_id: Device ID
-            enabled: True to enable, False to disable
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        try:
-            device_id = self.normalize_device_id(device_id)
-            if device_id in self.devices:
-                self.devices[device_id]['enabled'] = enabled
-                self.save_devices()
-                logger.info(f"{'Enabled' if enabled else 'Disabled'} device: {device_id}")
-                return True
-            return False
-        except Exception as e:
-            logger.error(f"Error enabling/disabling device: {e}")
-            return False
-    
-    def is_device_enabled(self, device_id: str) -> bool:
-        """
-        Check if device is enabled
-        
-        Args:
-            device_id: Device ID
-            
-        Returns:
-            True if enabled, False otherwise
-        """
-        device = self.get_device(device_id)
-        return device.get('enabled', False) if device else False
+    def update_last_seen(self, device_id, rssi):
+        if device_id in self.devices:
+            self.devices[device_id]['rssi'] = rssi
+            # Wir speichern RSSI nicht jedes Mal auf die Disk (schont SD-Karte)

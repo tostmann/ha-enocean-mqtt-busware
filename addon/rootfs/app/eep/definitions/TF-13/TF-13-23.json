@@ -7,10 +7,6 @@
   "type_title": "Brightness sensor FAH 300-30000 Lux",
   "bidirectional": false,
   "objects": {
-    "preDefined": [
-      "SVC",
-      "ILL"
-    ],
     "rssi": {
       "name": "RSSI",
       "component": "sensor",

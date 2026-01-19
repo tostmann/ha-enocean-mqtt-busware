@@ -20,7 +20,8 @@
         "write": false,
         "def": ""
       },
-      "native": {}
+      "native": {},
+      "component": "sensor"
     },
     "rssi": {
       "name": "RSSI",
