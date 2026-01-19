@@ -1,9 +1,8 @@
----
 name: "EnOcean MQTT Slim"
-version: "1.0.52"
+version: "1.1.53"
 slug: "enocean-mqtt-slim"
-description: "Lightweight EnOcean to MQTT bridge with web UI. Zero config files - manage all devices through the web interface. Supports 152 EEP profiles including temperature sensors, switches, actuators, and more!"
-url: "https://github.com/ESDN83/ha-enocean-mqtt-slim"
+description: "Lightweight EnOcean to MQTT bridge with Web UI & TCP/Serial support. Zero config, supports 152+ EEP profiles."
+url: "https://github.com/tostmann/ha-enocean-mqtt-slim"
 arch:
   - aarch64
   - amd64
