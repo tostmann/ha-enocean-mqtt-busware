@@ -1,22 +1,30 @@
 #!/usr/bin/with-contenv bashio
 
-# Get configuration
-# We check if a custom address (TCP) is provided first
-if bashio::config.has_value 'custom_address'; then
-    SERIAL_PORT=$(bashio::config 'custom_address')
-    bashio::log.info "Using Custom/TCP Address: ${SERIAL_PORT}"
-elif bashio::config.has_value 'serial_device'; then
-    SERIAL_PORT=$(bashio::config 'serial_device')
-    bashio::log.info "Using Serial Device: ${SERIAL_PORT}"
+# Configuration loading with priority logic
+TCP_ADDR=$(bashio::config 'tcp_address')
+SERIAL_DEV=$(bashio::config 'serial_device')
+
+# Logic: TCP Address overrides Serial Device selection
+if [ -n "$TCP_ADDR" ]; then
+    bashio::log.info "Configuration: Using TCP Address provided in text field."
+    SERIAL_PORT="$TCP_ADDR"
+elif [ -n "$SERIAL_DEV" ] && [ "$SERIAL_DEV" != "null" ]; then
+    bashio::log.info "Configuration: Using selected Serial Device."
+    SERIAL_PORT="$SERIAL_DEV"
 else
-    # Fallback/Error if nothing is configured
-    bashio::log.warning "No serial device or custom address configured!"
-    SERIAL_PORT=""
+    # Fallback / Error
+    bashio::log.warning "No connection configured! Please select a device or enter a TCP address."
+    SERIAL_PORT="/dev/ttyUSB0"
 fi
 
 LOG_LEVEL=$(bashio::config 'log_level')
 
-# Export environment variables for the Python app
+# --- NEU: Version automatisch holen ---
+ADDON_VERSION="$(bashio::addon.version)"
+bashio::log.info "Add-on Version: ${ADDON_VERSION}"
+
+# Export environment variables
+export ADDON_VERSION="${ADDON_VERSION}"  # <--- Hier wird sie für Python verfügbar gemacht
 export SERIAL_PORT="${SERIAL_PORT}"
 export LOG_LEVEL="${LOG_LEVEL}"
 export MQTT_HOST=$(bashio::services mqtt "host")
@@ -26,11 +34,10 @@ export MQTT_PASSWORD=$(bashio::services mqtt "password")
 export RESTORE_STATE=$(bashio::config 'restore_state')
 export RESTORE_DELAY=$(bashio::config 'restore_delay')
 
-# Log startup
+# Log startup details
 bashio::log.info "Starting EnOcean MQTT Slim..."
 bashio::log.info "Target Interface: ${SERIAL_PORT}"
 bashio::log.info "Log Level: ${LOG_LEVEL}"
-bashio::log.info "MQTT Broker: ${MQTT_HOST}:${MQTT_PORT}"
 
 # Start the application
 cd /app

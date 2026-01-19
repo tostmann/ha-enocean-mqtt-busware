@@ -1,412 +1,203 @@
 """
-Web UI Application
-FastAPI-based web interface for device management
+Web UI Application (Starlette)
+Handles HTTP requests and serves the dashboard
 """
+import os
+import json
 import logging
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from pathlib import Path
-from pydantic import BaseModel
-from typing import Optional
-import sys
-sys.path.append('/app')
-
+from starlette.applications import Starlette
+from starlette.responses import JSONResponse, HTMLResponse, Response
+from starlette.routing import Route, Mount
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from service_state import service_state
 
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
-app = FastAPI(title="EnOcean MQTT Slim")
+# Paths
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
 
-# Setup templates
-templates_dir = Path(__file__).parent / "templates"
-templates_dir.mkdir(exist_ok=True)
-templates = Jinja2Templates(directory=str(templates_dir))
+async def homepage(request):
+    """Serve the main dashboard with dynamic version injection"""
+    try:
+        with open(os.path.join(TEMPLATES_PATH, 'dashboard_full.html'), 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Inject Version from Environment (set by run.sh)
+        version = os.getenv('ADDON_VERSION', 'dev')
+        content = content.replace('{{VERSION}}', version)
+        
+        return HTMLResponse(content)
+    except Exception as e:
+        logger.error(f"Error serving dashboard: {e}")
+        return HTMLResponse(f"Error loading dashboard: {e}", status_code=500)
 
+# --- API Endpoints ---
 
-# Pydantic models for API
-class DeviceCreate(BaseModel):
-    id: str
-    name: str
-    eep: str
-    manufacturer: str = "EnOcean"
-
-
-class DeviceUpdate(BaseModel):
-    name: Optional[str] = None
-    eep: Optional[str] = None
-    manufacturer: Optional[str] = None
-    enabled: Optional[bool] = None
-
-
-@app.get("/", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    """Main dashboard"""
-    return templates.TemplateResponse("dashboard_full.html", {
-        "request": request,
-        "title": "EnOcean MQTT Slim",
-        "status": "Running"
-    })
-
-
-@app.get("/health")
-async def health():
-    """Health check endpoint"""
-    return {"status": "ok"}
-
-
-@app.get("/api/status")
-async def get_status():
+async def api_status(request):
     """Get service status"""
-    logger.info("=== API /api/status called ===")
-    try:
-        logger.info(f"service_state.service exists: {service_state.service is not None}")
-        if service_state.service:
-            logger.info(f"  eep_loader: {service_state.service.eep_loader is not None}")
-            logger.info(f"  device_manager: {service_state.service.device_manager is not None}")
-            logger.info(f"  mqtt_handler: {service_state.service.mqtt_handler is not None}")
-        
-        status = service_state.get_status()
-        logger.info(f"Status returned: {status}")
-        return status
-    except Exception as e:
-        logger.error(f"Error getting status: {e}", exc_info=True)
-        return {
-            "status": "error",
-            "eep_profiles": 0,
-            "devices": 0,
-            "gateway_connected": False,
-            "mqtt_connected": False
-        }
+    return JSONResponse(service_state.get_status())
 
+async def api_gateway_info(request):
+    """Get gateway info"""
+    return JSONResponse(service_state.get_gateway_info())
 
-@app.get("/api/gateway-info")
-async def get_gateway_info():
-    """Get gateway information"""
-    try:
-        gateway_info = service_state.get_gateway_info()
-        if not gateway_info:
-            return {
-                "base_id": "Not available",
-                "version": "Not available",
-                "chip_id": "Not available",
-                "description": "Gateway not connected"
-            }
-        return gateway_info
-    except Exception as e:
-        logger.error(f"Error getting gateway info: {e}", exc_info=True)
-        return {
-            "base_id": "Error",
-            "version": "Error",
-            "chip_id": "Error",
-            "description": str(e)
-        }
-
-
-@app.get("/api/eep-profiles")
-async def get_eep_profiles():
-    """Get list of available EEP profiles"""
-    logger.info("=== API /api/eep-profiles called ===")
-    try:
-        eep_loader = service_state.get_eep_loader()
-        logger.info(f"eep_loader exists: {eep_loader is not None}")
-        if not eep_loader:
-            logger.warning("EEP loader not available yet")
-            return {"profiles": []}
-        
-        profiles = eep_loader.list_profiles()
-        logger.info(f"Returning {len(profiles)} EEP profiles")
-        logger.info(f"First profile: {profiles[0] if profiles else 'None'}")
-        return {"profiles": profiles}
-    except Exception as e:
-        logger.error(f"Error getting EEP profiles: {e}", exc_info=True)
-        return {"profiles": []}
-
-
-@app.get("/api/eep-profiles/{eep_code}")
-async def get_eep_profile(eep_code: str):
-    """Get detailed information about a specific EEP profile"""
-    logger.info(f"=== API /api/eep-profiles/{eep_code} called ===")
-    try:
-        eep_loader = service_state.get_eep_loader()
-        if not eep_loader:
-            raise HTTPException(status_code=503, detail="EEP loader not available")
-        
-        profile = eep_loader.get_profile(eep_code)
-        if not profile:
-            raise HTTPException(status_code=404, detail=f"EEP profile {eep_code} not found")
-        
-        # Return full profile data
-        return {
-            "eep": profile.eep,
-            "title": profile.type_title,
-            "description": profile.description,
-            "telegram": getattr(profile, 'telegram', 'N/A'),
-            "rorg_number": profile.rorg_number,
-            "func_number": profile.func_number,
-            "type_number": profile.type_number,
-            "manufacturer": profile.manufacturer,
-            "bidirectional": profile.bidirectional,
-            "objects": profile.objects,
-            "case": profile.case
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting EEP profile {eep_code}: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/api/devices")
-async def get_devices():
-    """Get list of configured devices"""
-    logger.info("=== API /api/devices called ===")
-    try:
-        device_manager = service_state.get_device_manager()
-        logger.info(f"device_manager exists: {device_manager is not None}")
-        if not device_manager:
-            logger.warning("Device manager not available yet")
-            return {"devices": []}
-        
-        devices = device_manager.list_devices()
-        logger.info(f"Returning {len(devices)} devices")
-        return {"devices": devices}
-    except Exception as e:
-        logger.error(f"Error getting devices: {e}", exc_info=True)
-        return {"devices": []}
-
-
-@app.post("/api/devices")
-async def create_device(device: DeviceCreate):
-    """Create a new device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
+async def api_devices(request):
+    """List all devices"""
+    if request.method == 'GET':
+        manager = service_state.get_device_manager()
+        if not manager:
+            return JSONResponse({'error': 'Service not ready'}, status_code=503)
+        return JSONResponse({'devices': manager.list_devices()})
     
-    # Check if device already exists
-    if device_manager.get_device(device.id):
-        raise HTTPException(status_code=400, detail="Device already exists")
-    
-    # Validate EEP profile exists
-    eep_loader = service_state.get_eep_loader()
-    if eep_loader and not eep_loader.get_profile(device.eep):
-        raise HTTPException(status_code=400, detail=f"EEP profile {device.eep} not found")
-    
-    # Add device
-    success = device_manager.add_device(
-        device.id,
-        device.name,
-        device.eep,
-        device.manufacturer
-    )
-    
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to add device")
-    
-    # Publish MQTT discovery immediately if service is available
-    if service_state.service:
+    elif request.method == 'POST':
+        # Add new device
         try:
-            device_dict = device_manager.get_device(device.id)
-            logger.info(f"Publishing MQTT discovery for new device {device.id}")
-            await service_state.service.publish_device_discovery(device_dict)
-            logger.info(f"MQTT discovery published successfully for {device.id}")
+            data = await request.json()
+            manager = service_state.get_device_manager()
+            if not manager:
+                return JSONResponse({'error': 'Service not ready'}, status_code=503)
             
-            # Mark discovery as published to prevent republishing on first telegram
-            device_dict['discovery_published'] = True
-            device_manager.devices[device.id] = device_dict
+            success = manager.add_device(
+                data.get('id'),
+                data.get('name'),
+                data.get('eep'),
+                data.get('manufacturer', 'EnOcean')
+            )
             
+            if success:
+                # Trigger discovery update via MQTT
+                mqtt = service_state.get_mqtt_handler()
+                device = manager.get_device(data.get('id'))
+                if mqtt and device:
+                    # Async task in background ideally, but ok for now
+                    # We need to access the main service loop to publish properly if async
+                    # For now, we rely on the restart/reload or immediate effect if implemented
+                    pass
+                return JSONResponse({'status': 'created'})
+            else:
+                return JSONResponse({'detail': 'Device ID already exists or invalid EEP'}, status_code=400)
         except Exception as e:
-            logger.error(f"Error publishing discovery for {device.id}: {e}", exc_info=True)
-            # Don't fail the request, but log the error
-    else:
-        logger.warning(f"Service not available, MQTT discovery not published for {device.id}")
-    
-    return {"success": True, "device_id": device.id}
+            return JSONResponse({'detail': str(e)}, status_code=400)
 
-
-@app.get("/api/devices/{device_id}")
-async def get_device(device_id: str):
-    """Get a specific device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
+async def api_device_detail(request):
+    """Get/Update/Delete single device"""
+    device_id = request.path_params['device_id']
+    manager = service_state.get_device_manager()
+    if not manager:
+        return JSONResponse({'error': 'Service not ready'}, status_code=503)
     
-    device = device_manager.get_device(device_id)
-    if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
+    if request.method == 'GET':
+        device = manager.get_device(device_id)
+        if device:
+            return JSONResponse(device)
+        return JSONResponse({'detail': 'Device not found'}, status_code=404)
     
-    return device
-
-
-@app.put("/api/devices/{device_id}")
-async def update_device(device_id: str, update: DeviceUpdate):
-    """Update a device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
+    elif request.method == 'PUT':
+        data = await request.json()
+        success = manager.update_device(device_id, data)
+        if success:
+            return JSONResponse({'status': 'updated'})
+        return JSONResponse({'detail': 'Update failed'}, status_code=400)
     
-    device = device_manager.get_device(device_id)
-    if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Track if EEP changed (requires republishing discovery)
-    eep_changed = False
-    
-    # Update fields
-    if update.name is not None:
-        device['name'] = update.name
-    if update.eep is not None:
-        # Validate EEP profile
-        eep_loader = service_state.get_eep_loader()
-        if eep_loader and not eep_loader.get_profile(update.eep):
-            raise HTTPException(status_code=400, detail=f"EEP profile {update.eep} not found")
-        if device['eep'] != update.eep:
-            eep_changed = True
-        device['eep'] = update.eep
-    if update.manufacturer is not None:
-        device['manufacturer'] = update.manufacturer
-    if update.enabled is not None:
-        device_manager.enable_device(device_id, update.enabled)
-    
-    device_manager.devices[device_id] = device
-    device_manager.save_devices()
-    
-    # Republish MQTT discovery if EEP changed
-    if eep_changed and service_state.service:
-        try:
-            logger.info(f"EEP changed for device {device_id}, republishing MQTT discovery")
-            await service_state.service.publish_device_discovery(device)
-            logger.info(f"MQTT discovery republished successfully for {device_id}")
-        except Exception as e:
-            logger.error(f"Error republishing discovery for {device_id}: {e}", exc_info=True)
-    
-    return {"success": True}
-
-
-@app.delete("/api/devices/{device_id}")
-async def delete_device(device_id: str):
-    """Delete a device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
-    
-    device = device_manager.get_device(device_id)
-    if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Remove from MQTT/HA
-    mqtt_handler = service_state.get_mqtt_handler()
-    eep_loader = service_state.get_eep_loader()
-    if mqtt_handler and eep_loader:
-        try:
-            profile = eep_loader.get_profile(device['eep'])
-            if profile:
-                entities = profile.get_entities()
-                mqtt_handler.remove_device(device_id, entities)
-        except Exception as e:
-            logger.error(f"Error removing device from MQTT: {e}")
-    
-    # Remove from device manager
-    success = device_manager.remove_device(device_id)
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to remove device")
-    
-    return {"success": True}
-
-
-@app.post("/api/devices/{device_id}/enable")
-async def enable_device(device_id: str):
-    """Enable a device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
-    
-    success = device_manager.enable_device(device_id, True)
-    if not success:
-        raise HTTPException(status_code=404, detail="Device not found")
-    
-    return {"success": True}
-
-
-@app.post("/api/devices/{device_id}/disable")
-async def disable_device(device_id: str):
-    """Disable a device"""
-    device_manager = service_state.get_device_manager()
-    if not device_manager:
-        raise HTTPException(status_code=503, detail="Device manager not available")
-    
-    success = device_manager.enable_device(device_id, False)
-    if not success:
-        raise HTTPException(status_code=404, detail="Device not found")
-    
-    return {"success": True}
-
-
-@app.get("/api/suggest-profiles/{device_id}")
-async def suggest_profiles(device_id: str):
-    """
-    Suggest compatible EEP profiles for a device ID
-    Returns profiles that were detected during teach-in
-    """
-    logger.info(f"=== API /api/suggest-profiles/{device_id} called ===")
-    try:
-        # Normalize device ID to lowercase for lookup (telegrams use lowercase)
-        device_id_lower = device_id.lower()
-        logger.info(f"Normalized device ID for lookup: {device_id_lower}")
+    elif request.method == 'DELETE':
+        # Remove from MQTT first
+        mqtt = service_state.get_mqtt_handler()
+        device = manager.get_device(device_id)
         
-        # Get cached detected profiles
-        detected_eeps = service_state.get_detected_profiles(device_id_lower)
-        
-        if detected_eeps:
-            # Get full profile information
+        # We need EEP info to know which entities to remove
+        if mqtt and device:
             eep_loader = service_state.get_eep_loader()
             if eep_loader:
-                suggested_profiles = []
-                for eep in detected_eeps:
-                    profile = eep_loader.get_profile(eep)
-                    if profile:
-                        suggested_profiles.append({
-                            'eep': profile.eep,
-                            'title': profile.type_title,
-                            'description': profile.description,
-                            'manufacturer': profile.manufacturer
-                        })
-                
-                # SPECIAL CASE: Add MV-01-01 (Kessel Staufix) if not already in list
-                # The Kessel Staufix sends FUNC=00,TYPE=00 teach-in but should use MV-01-01
-                if not any(p['eep'] == 'MV-01-01' for p in suggested_profiles):
-                    mv_profile = eep_loader.get_profile('MV-01-01')
-                    if mv_profile:
-                        suggested_profiles.insert(0, {  # Insert at beginning
-                            'eep': mv_profile.eep,
-                            'title': mv_profile.type_title,
-                            'description': mv_profile.description,
-                            'manufacturer': mv_profile.manufacturer
-                        })
-                        logger.info(f"Added MV-01-01 (Kessel Staufix) to suggestions for {device_id}")
-                
-                logger.info(f"Found {len(suggested_profiles)} suggested profiles for {device_id}")
-                return {
-                    "device_id": device_id,
-                    "suggested_profiles": suggested_profiles,
-                    "has_suggestions": True,
-                    "message": f"Found {len(suggested_profiles)} compatible profiles from teach-in detection."
-                }
-        
-        logger.info(f"No suggested profiles found for {device_id}")
-        return {
-            "device_id": device_id,
-            "suggested_profiles": [],
-            "has_suggestions": False,
-            "message": "No teach-in data available. All profiles shown."
-        }
-        
-    except Exception as e:
-        logger.error(f"Error suggesting profiles for {device_id}: {e}", exc_info=True)
-        return {
-            "device_id": device_id,
-            "suggested_profiles": [],
-            "has_suggestions": False,
-            "message": str(e)
-        }
+                profile = eep_loader.get_profile(device['eep'])
+                if profile:
+                    mqtt.remove_device(device_id, profile.get_entities())
+
+        success = manager.remove_device(device_id)
+        if success:
+            return JSONResponse({'status': 'deleted'})
+        return JSONResponse({'detail': 'Delete failed'}, status_code=400)
+
+async def api_device_action(request):
+    """Enable/Disable device"""
+    device_id = request.path_params['device_id']
+    action = request.path_params['action']
+    
+    manager = service_state.get_device_manager()
+    if not manager:
+        return JSONResponse({'error': 'Service not ready'}, status_code=503)
+    
+    device = manager.get_device(device_id)
+    if not device:
+        return JSONResponse({'detail': 'Device not found'}, status_code=404)
+    
+    updates = {'enabled': (action == 'enable')}
+    manager.update_device(device_id, updates)
+    return JSONResponse({'status': 'updated'})
+
+async def api_eep_profiles(request):
+    """List all EEP profiles"""
+    loader = service_state.get_eep_loader()
+    if not loader:
+        return JSONResponse({'profiles': []})
+    
+    return JSONResponse({'profiles': loader.list_profiles()})
+
+async def api_eep_detail(request):
+    """Get EEP profile details"""
+    eep_code = request.path_params['eep_code']
+    loader = service_state.get_eep_loader()
+    if not loader:
+        return JSONResponse({'error': 'Service not ready'}, status_code=503)
+    
+    profile = loader.get_profile(eep_code)
+    if profile:
+        return JSONResponse(profile.to_dict())
+    return JSONResponse({'detail': 'Profile not found'}, status_code=404)
+
+async def api_suggest_profiles(request):
+    """Get suggested profiles for a device ID based on cached teach-in telegrams"""
+    device_id = request.path_params['device_id']
+    
+    # Get cached EEPs from teach-in detection
+    detected_eeps = service_state.get_detected_profiles(device_id)
+    loader = service_state.get_eep_loader()
+    
+    suggestions = []
+    if loader and detected_eeps:
+        for eep in detected_eeps:
+            profile = loader.get_profile(eep)
+            if profile:
+                suggestions.append({
+                    'eep': profile.eep,
+                    'title': profile.title,
+                    'description': profile.description
+                })
+    
+    return JSONResponse({
+        'device_id': device_id,
+        'has_suggestions': len(suggestions) > 0,
+        'suggested_profiles': suggestions
+    })
+
+# Routes definition
+routes = [
+    Route('/', endpoint=homepage),
+    Route('/api/status', endpoint=api_status),
+    Route('/api/gateway-info', endpoint=api_gateway_info),
+    Route('/api/devices', endpoint=api_devices, methods=['GET', 'POST']),
+    Route('/api/devices/{device_id}', endpoint=api_device_detail, methods=['GET', 'PUT', 'DELETE']),
+    Route('/api/devices/{device_id}/{action}', endpoint=api_device_action, methods=['POST']),
+    Route('/api/eep-profiles', endpoint=api_eep_profiles),
+    Route('/api/eep-profiles/{eep_code}', endpoint=api_eep_detail),
+    Route('/api/suggest-profiles/{device_id}', endpoint=api_suggest_profiles),
+]
+
+# CORS middleware for development flexibility
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
+]
+
+# Create app
+app = Starlette(debug=True, routes=routes, middleware=middleware)

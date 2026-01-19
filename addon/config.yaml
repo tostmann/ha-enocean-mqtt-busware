@@ -1,7 +1,7 @@
 name: "EnOcean MQTT TCP/Serial"
-version: "1.1.54"
+version: "1.1.56"
 slug: "enocean-mqtt-tcp"
-description: "Advanced EnOcean to MQTT bridge with Web UI. Supports TCP & Serial Transceivers, zero config, and 152+ EEP profiles."
+description: "Advanced EnOcean Bridge. Select USB device OR enter TCP Address manually."
 url: "https://github.com/tostmann/ha-enocean-mqtt-slim"
 arch:
   - aarch64
@@ -25,14 +25,14 @@ map:
 
 options:
   serial_device: null
-  custom_address: ""
+  tcp_address: ""
   log_level: "info"
   restore_state: true
   restore_delay: 5
 
 schema:
   serial_device: "device(subsystem=tty)?"
-  custom_address: "str?"
+  tcp_address: "str?"
   log_level: "list(debug|info|warning|error)"
   restore_state: "bool"
   restore_delay: "int(1,60)"
