@@ -1,7 +1,7 @@
-name: "EnOcean MQTT Slim"
+name: "EnOcean MQTT TCP/Serial"
 version: "1.1.53"
-slug: "enocean-mqtt-slim"
-description: "Lightweight EnOcean to MQTT bridge with Web UI & TCP/Serial support. Zero config, supports 152+ EEP profiles."
+slug: "enocean-mqtt-tcp"
+description: "Advanced EnOcean to MQTT bridge with Web UI. Supports TCP & Serial Transceivers, zero config, and 152+ EEP profiles."
 url: "https://github.com/tostmann/ha-enocean-mqtt-slim"
 arch:
   - aarch64
@@ -14,7 +14,7 @@ uart: true
 ingress: true
 ingress_port: 8099
 panel_icon: mdi:radio-tower
-panel_title: "EnOcean Devices"
+panel_title: "EnOcean TCP"
 homeassistant_api: true
 services:
   - mqtt:need
@@ -30,7 +30,7 @@ options:
   restore_delay: 5
 
 schema:
-  serial_port: "device(subsystem=tty)?"
+  serial_port: "str" 
   log_level: "list(debug|info|warning|error)"
   restore_state: "bool"
   restore_delay: "int(1,60)"
