@@ -5,7 +5,15 @@ import asyncio
 import logging
 import os
 import sys
+import signal
 from datetime import datetime
+
+# Determine base path dynamically to allow running outside of /app
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
+# Add base path to sys.path so imports work correctly
+if BASE_PATH not in sys.path:
+    sys.path.insert(0, BASE_PATH)
 
 from core.serial_handler import SerialHandler
 from core.esp3_protocol import ESP3Packet
@@ -20,10 +28,6 @@ from service_state import service_state
 import uvicorn
 # Import web app after service_state to ensure proper initialization
 from web_ui.app import app as web_app
-
-# Import at module level for use in teach-in handling
-import sys
-sys.path.insert(0, '/app')
 
 # Configure logging
 log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
@@ -50,6 +54,7 @@ class EnOceanMQTTService:
         self.running = False
         
         # Configuration from environment
+        # SERIAL_PORT can now be a path (/dev/ttyUSB0) or a TCP URL (tcp://192.168.1.10:2000)
         self.serial_port = os.getenv('SERIAL_PORT', '')
         self.mqtt_host = os.getenv('MQTT_HOST', 'localhost')
         self.mqtt_port = int(os.getenv('MQTT_PORT', 1883))
@@ -66,11 +71,14 @@ class EnOceanMQTTService:
         
         # Load EEP profiles
         logger.info("Loading EEP profiles...")
-        self.eep_loader = EEPLoader('/app/eep/definitions')
+        
+        # Use dynamic path for EEP definitions
+        eep_definitions_path = os.path.join(BASE_PATH, 'eep', 'definitions')
+        self.eep_loader = EEPLoader(eep_definitions_path)
         self.eep_parser = EEPParser()
         
         if len(self.eep_loader.profiles) == 0:
-            logger.error("No EEP profiles loaded! Check definitions directory.")
+            logger.error(f"No EEP profiles loaded! Check definitions directory at: {eep_definitions_path}")
             return False
         
         logger.info(f"✓ Loaded {len(self.eep_loader.profiles)} EEP profiles")
@@ -83,33 +91,39 @@ class EnOceanMQTTService:
         if len(profiles) > 5:
             logger.info(f"  ... and {len(profiles) - 5} more")
         
-        # Initialize serial port if configured
+        # Initialize transceiver connection (Serial or TCP)
         if self.serial_port:
-            logger.info(f"Opening serial port: {self.serial_port}")
-            self.serial_handler = SerialHandler(self.serial_port)
-            
-            if not self.serial_handler.open():
-                logger.error(f"Failed to open serial port: {self.serial_port}")
-                logger.warning("Continuing without serial port (web UI only mode)")
-                self.serial_handler = None
-            else:
-                logger.info("✓ Serial port opened successfully")
+            logger.info(f"Initializing connection to: {self.serial_port}")
+            try:
+                self.serial_handler = SerialHandler(self.serial_port)
                 
-                # Query gateway info
-                try:
-                    base_id = await self.serial_handler.get_base_id()
-                    if base_id:
-                        logger.info(f"✓ Gateway Base ID: {base_id}")
+                # CHANGED: We do NOT set self.serial_handler to None if open fails.
+                # This allows the background loop to retry the connection later.
+                if not self.serial_handler.open():
+                    logger.warning(f"⚠️ Initial connection to {self.serial_port} failed.")
+                    logger.warning("   Will retry connecting in the background loop...")
+                else:
+                    logger.info("✓ Transceiver connection established successfully")
                     
-                    version_info = await self.serial_handler.get_version_info()
-                    if version_info:
-                        logger.info(f"✓ Gateway Version: {version_info['app_version']}")
-                        logger.info(f"  Chip ID: {version_info['chip_id']}")
-                        logger.info(f"  Description: {version_info['app_description']}")
-                except Exception as e:
-                    logger.error(f"Error querying gateway info: {e}")
+                    # Query gateway info immediately if connected
+                    try:
+                        base_id = await self.serial_handler.get_base_id()
+                        if base_id:
+                            logger.info(f"✓ Gateway Base ID: {base_id}")
+                        
+                        version_info = await self.serial_handler.get_version_info()
+                        if version_info:
+                            logger.info(f"✓ Gateway Version: {version_info['app_version']}")
+                            logger.info(f"  Chip ID: {version_info['chip_id']}")
+                            logger.info(f"  Description: {version_info['app_description']}")
+                    except Exception as e:
+                        logger.error(f"Error querying gateway info: {e}")
+            except Exception as e:
+                logger.error(f"Error initializing handler: {e}")
+                # Only if we can't even instantiate the handler we set it to None
+                self.serial_handler = None
         else:
-            logger.warning("No serial port configured")
+            logger.warning("No connection string configured (SERIAL_PORT env var is empty)")
             logger.info("Running in web UI only mode")
         
         # Initialize device manager
@@ -271,9 +285,6 @@ class EnOceanMQTTService:
             logger.info(f"   RSSI: {rssi} dBm")
             logger.info(f"   Data: {data_hex}")
             
-            # Sender ID is now correctly extracted by get_sender_id() in esp3_protocol.py
-            # No workaround needed!
-            
             # Check if device is already configured - if so, treat as data even if LRN=0
             device = self.device_manager.get_device(sender_id)
             
@@ -295,12 +306,6 @@ class EnOceanMQTTService:
                 
                 # For 4BS (A5) teach-in telegrams with EEP information
                 if rorg == 0xA5 and len(packet.data) >= 9:
-                    # 4BS teach-in telegram format:
-                    # Byte 0: RORG (A5)
-                    # Byte 1-4: DB3, DB2, DB1, DB0 (teach-in data)
-                    # Byte 5-8: Sender ID (4 bytes) - already correctly extracted by get_sender_id()
-                    # Byte 9: Status
-                    
                     db3 = packet.data[1]
                     db2 = packet.data[2]
                     db1 = packet.data[3]
@@ -674,130 +679,145 @@ class EnOceanMQTTService:
             logger.info("Listening for EnOcean telegrams...")
             try:
                 await self.serial_handler.start_reading(self.process_telegram)
+            except asyncio.CancelledError:
+                logger.info("Serial reader cancelled")
+                raise
             except Exception as e:
                 logger.error(f"Error in serial reader: {e}")
     
     async def run_web_server(self):
         """Run web server task"""
         logger.info("Starting web UI on port 8099...")
+        # IMPORTANT: Configure uvicorn to NOT handle signals itself, 
+        # so we can control the shutdown loop
         config = uvicorn.Config(
             web_app,
             host="0.0.0.0",
             port=8099,
             log_level="warning",
-            access_log=False
+            access_log=False,
+            loop="asyncio" 
         )
         server = uvicorn.Server(config)
+        # We handle signals in main(), but uvicorn might still install them by default in .serve()
+        # unless running in a thread/task context where it might be passive.
+        # But to be safe, we just await it.
         await server.serve()
     
     async def run(self):
-        """Main run loop"""
+        """Main run loop with robust signal handling"""
         self.running = True
         
-        # Initialize first, THEN register with state manager
+        # 1. Initialize
         if not await self.initialize():
             logger.error("Initialization failed, exiting")
             return
         
-        # NOW register service with state manager (after initialization complete)
+        # 2. Register Service
         service_state.set_service(self)
-        logger.info("✓ Service registered with state manager")
-        
-        # Store gateway info if available
         if self.serial_handler:
             try:
-                base_id = await self.serial_handler.get_base_id()
-                version_info = await self.serial_handler.get_version_info()
-                if base_id and version_info:
-                    service_state.set_gateway_info({
-                        "base_id": base_id,
-                        "version": version_info.get('app_version', 'Unknown'),
-                        "chip_id": version_info.get('chip_id', 'Unknown'),
-                        "description": version_info.get('app_description', 'Unknown')
-                    })
-            except Exception as e:
-                logger.error(f"Error storing gateway info: {e}")
+                # Try to get gateway info if connected, but don't fail if not
+                # (it might be connecting in background)
+                if self.serial_handler.is_open():
+                    base_id = await self.serial_handler.get_base_id()
+                    version = await self.serial_handler.get_version_info()
+                    if base_id:
+                        service_state.set_gateway_info({
+                            "base_id": base_id,
+                            "version": version.get('app_version', 'Unknown') if version else 'Unknown',
+                            "chip_id": version.get('chip_id', 'Unknown') if version else 'Unknown',
+                            "description": version.get('app_description', '') if version else ''
+                        })
+            except Exception:
+                pass
         
-        # Restore last known states if enabled
-        if self.restore_state and self.state_persistence and self.mqtt_handler and self.mqtt_handler.connected:
-            logger.info("=" * 60)
+        # 3. Restore State
+        if self.restore_state and self.state_persistence and self.mqtt_handler:
             logger.info(f"⏳ Waiting {self.restore_delay}s before restoring states...")
-            logger.info("=" * 60)
             await asyncio.sleep(self.restore_delay)
-            
-            logger.info("=" * 60)
-            logger.info("🔄 Restoring last known device states...")
-            logger.info("=" * 60)
-            
-            restored_count = 0
-            all_states = self.state_persistence.get_all_states()
-            
-            for device_id, state_data in all_states.items():
-                device = self.device_manager.get_device(device_id)
-                if device and device.get('enabled') and state_data:
-                    try:
-                        # Republish last known state
-                        self.mqtt_handler.publish_state(device_id, state_data, retain=True)
-                        self.mqtt_handler.publish_availability(device_id, True)
-                        logger.info(f"  ✓ Restored state for {device['name']} ({device_id})")
-                        restored_count += 1
-                    except Exception as e:
-                        logger.error(f"  ✗ Failed to restore state for {device_id}: {e}")
-            
-            if restored_count > 0:
-                logger.info(f"✓ Restored {restored_count} device state(s)")
-            else:
-                logger.info("No states to restore")
-            logger.info("=" * 60)
+            states = self.state_persistence.get_all_states()
+            for dev_id, st in states.items():
+                dev = self.device_manager.get_device(dev_id)
+                if dev and dev.get('enabled'):
+                    self.mqtt_handler.publish_state(dev_id, st, retain=True)
+                    self.mqtt_handler.publish_availability(dev_id, True)
+            logger.info("✓ States restored")
+
+        # 4. Start Tasks & Signal Handling
+        logger.info("Service is running! (Press Ctrl+C to stop)")
         
-        logger.info("=" * 60)
-        logger.info("Service is running!")
-        logger.info("Web UI available via Home Assistant ingress")
-        logger.info("=" * 60)
+        loop = asyncio.get_running_loop()
+        stop_event = asyncio.Event()
         
-        # Run web server and serial reader concurrently
-        tasks = [
-            asyncio.create_task(self.run_web_server()),
-        ]
+        # Create Signal Handler
+        def signal_handler():
+            logger.info("🛑 Stop signal received!")
+            stop_event.set()
+            
+        # Register Signals
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            try:
+                loop.add_signal_handler(sig, signal_handler)
+            except NotImplementedError:
+                # Windows support (rarely needed here but good practice)
+                signal.signal(sig, lambda s, f: signal_handler())
         
+        # Start core tasks
+        tasks = []
+        web_task = asyncio.create_task(self.run_web_server())
+        tasks.append(web_task)
+        
+        serial_task = None
         if self.serial_handler:
-            tasks.append(asyncio.create_task(self.run_serial_reader()))
+            serial_task = asyncio.create_task(self.run_serial_reader())
+            tasks.append(serial_task)
         
-        try:
-            await asyncio.gather(*tasks)
-        except KeyboardInterrupt:
-            logger.info("Received shutdown signal")
-        except Exception as e:
-            logger.error(f"Error in main loop: {e}")
-        finally:
-            await self.shutdown()
-    
-    async def shutdown(self):
-        """Shutdown service"""
-        logger.info("Shutting down...")
+        # 5. Main Loop Waiter
+        # We wait until EITHER the stop_event is set OR one of the main tasks fails/exits
+        
+        stop_waiter = asyncio.create_task(stop_event.wait())
+        tasks.append(stop_waiter)
+        
+        # Wait for the *first* thing to happen (Signal OR Webserver crash OR Serial crash)
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        
+        # 6. Shutdown Sequence
+        logger.info("Shutting down services...")
         self.running = False
         
-        if self.command_tracker:
-            self.command_tracker.stop()
-        
+        # Stop Serial Handler explicitly
         if self.serial_handler:
             self.serial_handler.stop_reading()
             self.serial_handler.close()
         
-        logger.info("Shutdown complete")
+        # Cancel all pending tasks (including web server if it's still running)
+        for task in pending:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+        
+        # Ensure 'done' tasks are inspected for exceptions
+        for task in done:
+            if task == stop_waiter: continue
+            if not task.cancelled() and task.exception():
+                logger.error(f"Task failed with error: {task.exception()}")
+
+        logger.info("Shutdown complete. Bye! 👋")
 
 
 async def main():
-    """Main entry point"""
     service = EnOceanMQTTService()
     await service.run()
-
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Interrupted by user")
+        # Should be handled inside run(), but just in case
+        pass
     except Exception as e:
-        logger.error(f"Fatal error: {e}", exc_info=True)
+        print(f"Fatal error: {e}")
         sys.exit(1)

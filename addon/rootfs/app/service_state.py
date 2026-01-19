@@ -44,11 +44,19 @@ class ServiceState:
                 "mqtt_connected": False
             }
         
+        # FIX: is_open() ist eine Methode, daher müssen Klammern () gesetzt werden!
+        gateway_connected = False
+        if self.service.serial_handler:
+            try:
+                gateway_connected = self.service.serial_handler.is_open()
+            except Exception:
+                gateway_connected = False
+
         return {
             "status": "running" if self.service.running else "stopped",
             "eep_profiles": len(self.service.eep_loader.profiles) if self.service.eep_loader else 0,
             "devices": len(self.service.device_manager.list_devices()) if self.service.device_manager else 0,
-            "gateway_connected": self.service.serial_handler is not None and self.service.serial_handler.is_open if self.service.serial_handler else False,
+            "gateway_connected": gateway_connected,
             "mqtt_connected": self.service.mqtt_handler.connected if self.service.mqtt_handler else False
         }
     

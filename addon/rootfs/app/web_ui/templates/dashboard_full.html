@@ -27,13 +27,14 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-dark bg-primary">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">
-                <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim
+                <i class="bi bi-radio-tower"></i> EnOcean MQTT Slim 
+                <span class="badge bg-warning text-dark ms-2" style="font-size: 0.6rem; vertical-align: middle;">TCP/SERIAL FORK</span>
             </span>
             <div>
+                <span class="badge bg-warning text-dark me-2"><i class="bi bi-ethernet"></i> TCP Ready</span>
                 <span class="badge bg-light text-dark me-2">v1.0.51</span>
                 <span class="badge bg-success" id="status-badge">Running</span>
             </div>
@@ -41,7 +42,6 @@
     </nav>
 
     <div class="container-fluid mt-4">
-        <!-- Status Bar -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="alert alert-info d-flex justify-content-between align-items-center">
@@ -63,7 +63,6 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="card card-stat text-center" onclick="showGatewayInfo()">
@@ -103,7 +102,6 @@
             </div>
         </div>
 
-        <!-- Device List -->
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -128,7 +126,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Device Modal -->
     <div class="modal fade" id="deviceModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -184,7 +181,6 @@
         </div>
     </div>
 
-    <!-- Gateway Info Modal -->
     <div class="modal fade" id="gatewayModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -205,7 +201,6 @@
         </div>
     </div>
 
-    <!-- EEP Profiles Modal -->
     <div class="modal fade" id="eepModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -214,7 +209,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Search Bar -->
                     <div class="mb-3">
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -226,7 +220,6 @@
                         <small class="text-muted">Examples: A5-02, temperature, humidity, switch</small>
                     </div>
                     
-                    <!-- Profile List -->
                     <div id="eep-list-container" style="max-height: 500px; overflow-y: auto;">
                         <div class="text-center">
                             <div class="spinner-border text-primary" role="status"></div>
@@ -238,7 +231,6 @@
         </div>
     </div>
 
-    <!-- Profile Detail Modal -->
     <div class="modal fade" id="profileDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
