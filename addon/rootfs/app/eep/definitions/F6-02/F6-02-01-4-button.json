@@ -1,0 +1,89 @@
+{
+  "eep": "F6-02-01-4-button",
+  "rorg_number": "0xF6",
+  "func_number": "0x02",
+  "type_number": "0x01",
+  "type_title": "Rocker Switch (4 Buttons)",
+  "description": "4-Button Switch (PTM 215)",
+  "objects": {
+    "BI": {
+      "name": "Button B-I (Left Top)",
+      "component": "binary_sensor",
+      "device_class": "power",
+      "icon": "mdi:arrow-top-left-bold-box"
+    },
+    "B0": {
+      "name": "Button B-0 (Left Bottom)",
+      "component": "binary_sensor",
+      "device_class": "power",
+      "icon": "mdi:arrow-bottom-left-bold-box"
+    },
+    "AI": {
+      "name": "Button A-I (Right Top)",
+      "component": "binary_sensor",
+      "device_class": "power",
+      "icon": "mdi:arrow-top-right-bold-box"
+    },
+    "A0": {
+      "name": "Button A-0 (Right Bottom)",
+      "component": "binary_sensor",
+      "device_class": "power",
+      "icon": "mdi:arrow-bottom-right-bold-box"
+    },
+    "rssi": {
+      "name": "RSSI",
+      "component": "sensor",
+      "device_class": "signal_strength",
+      "unit": "dBm",
+      "icon": "mdi:wifi"
+    },
+    "last_seen": {
+      "name": "Last Seen",
+      "component": "sensor",
+      "device_class": "timestamp",
+      "icon": "mdi:clock-outline"
+    }
+  },
+  "case": [
+    {
+      "comment": "Button Release (All OFF)",
+      "datafield": [
+        { "shortcut": "BI", "value": "0" },
+        { "shortcut": "B0", "value": "0" },
+        { "shortcut": "AI", "value": "0" },
+        { "shortcut": "A0", "value": "0" }
+      ],
+      "status": "0x00" 
+    },
+    {
+      "comment": "Button Release (Alternative for some switches)",
+      "datafield": [
+        { "shortcut": "BI", "value": "0" },
+        { "shortcut": "B0", "value": "0" },
+        { "shortcut": "AI", "value": "0" },
+        { "shortcut": "A0", "value": "0" }
+      ],
+      "status": "0x20" 
+    },
+    {
+      "comment": "Button BI Pressed (Left Top)",
+      "datafield": [{ "shortcut": "BI", "value": "1" }],
+      "data": "0x70"
+    },
+    {
+      "comment": "Button B0 Pressed (Left Bottom)",
+      "datafield": [{ "shortcut": "B0", "value": "1" }],
+      "data": "0x50"
+    },
+    {
+      "comment": "Button AI Pressed (Right Top)",
+      "datafield": [{ "shortcut": "AI", "value": "1" }],
+      "data": "0x30"
+    },
+    {
+      "comment": "Button A0 Pressed (Right Bottom)",
+      "datafield": [{ "shortcut": "A0", "value": "1" }],
+      "data": "0x10"
+    }
+  ]
+}

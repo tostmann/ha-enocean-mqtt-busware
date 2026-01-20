@@ -19,7 +19,6 @@ TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
 
 async def homepage(request):
     try:
-        # We use dashboard_new as the main dashboard now
         with open(os.path.join(TEMPLATES_PATH, 'dashboard_new.html'), 'r', encoding='utf-8') as f:
             content = f.read()
         return HTMLResponse(content)
@@ -32,7 +31,6 @@ async def api_status(request):
     """Get service status including Discovery info"""
     status = service_state.get_status()
     
-    # Add Discovery Status dynamically
     service = service_state.get_service()
     if service:
         status['discovery_active'] = service.is_discovery_active()
@@ -52,7 +50,7 @@ async def api_discovery_control(request):
     if request.method == 'POST':
         try:
             data = await request.json()
-            action = data.get('action') # 'start' or 'stop'
+            action = data.get('action')
             
             if action == 'start':
                 duration = int(data.get('duration', 60))
@@ -83,7 +81,6 @@ async def api_devices(request):
                 data.get('eep'),
                 data.get('manufacturer', 'EnOcean')
             )
-            # Optional RORG update
             if success and data.get('rorg'):
                 dev = manager.get_device(data.get('id'))
                 if dev:
@@ -106,9 +103,44 @@ async def api_device_detail(request):
         return JSONResponse({'detail': 'Device not found'}, status_code=404)
     
     elif request.method == 'PUT':
+        # 1. Alten Zustand merken (für Cleanup)
+        old_device = manager.get_device(device_id)
+        if not old_device:
+             return JSONResponse({'detail': 'Device not found'}, status_code=404)
+        old_eep = old_device.get('eep')
+        
+        # 2. Update durchführen
         data = await request.json()
         success = manager.update_device(device_id, data)
-        if success: return JSONResponse({'status': 'updated'})
+        
+        if success:
+            # 3. Home Assistant aktualisieren (Entitäten neu publizieren)
+            service = service_state.get_service()
+            if service:
+                new_device = manager.get_device(device_id)
+                new_eep = new_device.get('eep')
+
+                # A) Alte Entitäten löschen, falls sich das EEP geändert hat
+                if old_eep and old_eep != 'pending' and old_eep != new_eep:
+                    logger.info(f"EEP changed from {old_eep} to {new_eep}. Removing old entities...")
+                    loader = service_state.get_eep_loader()
+                    mqtt = service_state.get_mqtt_handler()
+                    if loader and mqtt:
+                        try:
+                            old_profile = loader.get_profile(old_eep)
+                            if old_profile:
+                                old_entities = old_profile.get_entities()
+                                mqtt.remove_device(device_id, old_entities)
+                        except Exception as e:
+                            logger.error(f"Error removing old entities: {e}")
+
+                # B) Neue Entitäten anlegen / aktualisieren
+                if new_device.get('enabled') and new_eep != 'pending':
+                    logger.info(f"Triggering discovery update for {device_id}")
+                    await service.publish_device_discovery(new_device)
+            
+            return JSONResponse({'status': 'updated'})
+        
         return JSONResponse({'detail': 'Update failed'}, status_code=400)
     
     elif request.method == 'DELETE':
