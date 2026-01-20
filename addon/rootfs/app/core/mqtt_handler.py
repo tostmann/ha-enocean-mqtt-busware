@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-import os  # <--- DIESER IMPORT FEHLTE!
+import os  # <--- WICHTIG!
 import paho.mqtt.client as mqtt
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ class MQTTHandler:
         self.port = port
         self.username = username
         self.password = password
-        # Hier wurde 'os' verwendet, ohne importiert zu sein:
+        # WICHTIG: os.urandom braucht den import os oben!
         self.client = mqtt.Client(client_id=f"enocean-mqtt-tcp-{os.urandom(4).hex()}")
         
         if self.username and self.password:
@@ -111,15 +111,11 @@ class MQTTHandler:
 
     def remove_device(self, device_id, entities):
         if not self.connected: return
-        logger.info(f"🗑 Removing device {device_id} from Home Assistant...")
-        
         self.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=True)
         self.client.publish(f"enocean/{device_id}/availability", "", qos=1, retain=True)
-
         for entity in entities:
             key = entity.get('key', 'main')
             component = entity.get('component', 'sensor')
             unique_id = f"{device_id}_{key}"
             discovery_topic = f"homeassistant/{component}/{unique_id}/config"
             self.client.publish(discovery_topic, "", qos=1, retain=True)
-            logger.debug(f"   -> Cleared discovery topic: {discovery_topic}")

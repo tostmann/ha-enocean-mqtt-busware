@@ -1,6 +1,7 @@
 """
-Web UI Application (Starlette)
+Web UI Application (Starlette) - FIX for Real EEP Name
 """
+# ... Imports gleich ...
 import os
 import json
 import logging
@@ -78,35 +79,31 @@ async def api_device_detail(request):
         data = await request.json()
         service = service_state.get_service()
         
-        # --- PROVISIONING LOGIC ---
-        # Wenn eine Provisioning-URL übergeben wurde, laden wir das Profil erst herunter
+        # --- PROVISIONING LOGIC (FIX) ---
         if 'provisioning_variant_url' in data and service:
             url = data['provisioning_variant_url']
             vid = data['provisioning_variant_id']
-            # Generiere eindeutigen Namen für das lokale Profil
-            new_eep_name = f"PROV-{device_id}-{vid}"
+            # Name hint for file
+            file_hint = f"PROV-{device_id}-{vid}"
             
-            # Download anstoßen
-            if await service._download_and_save_profile(url, new_eep_name):
-                # Wenn erfolgreich, setzen wir das EEP auf den neuen Namen
-                data['eep'] = new_eep_name
-                # Entfernen der Hilfsfelder
+            # Download and get REAL name
+            real_eep = await service._download_and_save_profile(url, file_hint)
+            
+            if real_eep:
+                data['eep'] = real_eep  # Use the real internal name!
                 del data['provisioning_variant_url']
                 del data['provisioning_variant_id']
             else:
                 return JSONResponse({'detail': 'Profile download failed'}, status_code=502)
 
-        # Alte Daten für Cleanup merken
         old_device = manager.get_device(device_id)
         old_eep = old_device.get('eep') if old_device else None
         
-        # Update durchführen
         if manager.update_device(device_id, data):
             if service:
                 new_device = manager.get_device(device_id)
                 new_eep = new_device.get('eep')
                 
-                # Cleanup Old Entities (falls EEP gewechselt hat)
                 if old_eep and old_eep != 'pending' and old_eep != new_eep:
                     loader = service_state.get_eep_loader()
                     mqtt = service_state.get_mqtt_handler()
@@ -114,7 +111,6 @@ async def api_device_detail(request):
                         prof = loader.get_profile(old_eep)
                         if prof: mqtt.remove_device(device_id, prof.get_entities())
                 
-                # Publish New Entities
                 if new_device.get('enabled') and new_eep != 'pending':
                     await service.publish_device_discovery(new_device)
             
@@ -122,34 +118,24 @@ async def api_device_detail(request):
         return JSONResponse({'detail': 'Failed'}, status_code=400)
     
     elif request.method == 'DELETE':
-        # --- DELETE LOGIC ---
-        # 1. Wir müssen erst wissen, WELCHE Entities das Gerät hatte, um sie in HA zu löschen
         device = manager.get_device(device_id)
-        
         if device:
             mqtt = service_state.get_mqtt_handler()
             loader = service_state.get_eep_loader()
-            
-            # Versuchen, die Entities via MQTT zu entfernen
             if mqtt and loader and device.get('eep') != 'pending':
                 try:
                     profile = loader.get_profile(device['eep'])
                     if profile:
                         entities = profile.get_entities()
-                        # Sendet leere Configs an HA
                         mqtt.remove_device(device_id, entities)
                 except Exception as e:
                     logger.error(f"Error removing HA entities during delete: {e}")
 
-            # 2. Jetzt erst aus der internen DB löschen
             if manager.remove_device(device_id):
                 service_state.update_status('devices', len(manager.list_devices()))
-                
-                # MQTT State Topic auch noch leeren (optional)
                 if mqtt:
                     mqtt.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=True)
                     mqtt.client.publish(f"enocean/{device_id}/availability", "", qos=1, retain=True)
-
                 return JSONResponse({'status': 'deleted'})
         
         return JSONResponse({'detail': 'Delete failed or device not found'}, status_code=400)

@@ -1,6 +1,5 @@
 """
 EnOcean MQTT TCP - Main Application
-Features: Instant Webserver, Cloud Provisioning, Robust Discovery
 """
 import asyncio
 import logging
@@ -77,7 +76,7 @@ class EnOceanMQTTService:
             if datetime.now() < self.discovery_end_time:
                 return True
             else:
-                self.discovery_end_time = None # Expired
+                self.discovery_end_time = None 
         return False
         
     def get_discovery_time_remaining(self):
@@ -85,8 +84,10 @@ class EnOceanMQTTService:
         return int((self.discovery_end_time - datetime.now()).total_seconds())
 
     # --- Provisioning Logic ---
-    async def _download_and_save_profile(self, url, profile_name):
-        """Downloads JSON profile and saves it locally"""
+    async def _download_and_save_profile(self, url, filename_hint):
+        """
+        Downloads JSON profile, saves it, and RETURNS THE INTERNAL EEP NAME.
+        """
         import aiohttp
         try:
             logger.info(f"Downloading profile from {url}...")
@@ -94,26 +95,37 @@ class EnOceanMQTTService:
                 async with session.get(url, timeout=5) as response:
                     if response.status == 200:
                         data = await response.json()
+                        
+                        # --- FIX: Read the REAL EEP name from JSON ---
+                        real_eep_name = data.get('eep')
+                        if not real_eep_name:
+                            logger.error("Downloaded JSON has no 'eep' field!")
+                            return None
+
                         path = os.path.join(BASE_PATH, 'eep', 'definitions', 'provisioned')
                         os.makedirs(path, exist_ok=True)
-                        filename = f"{profile_name}.json"
+                        
+                        # Use the hint for filename, but content determines the EEP ID
+                        filename = f"{filename_hint}.json"
                         with open(os.path.join(path, filename), 'w') as f:
                             json.dump(data, f, indent=2)
-                        self.eep_loader.load_profiles() # Refresh loader
-                        logger.info(f"✅ Profile {profile_name} downloaded and loaded.")
-                        return True
+                        
+                        self.eep_loader.load_profiles() 
+                        logger.info(f"✅ Profile loaded. Internal Name: {real_eep_name}")
+                        
+                        # Return the REAL name to be saved in Device DB
+                        return real_eep_name
                     else:
                         logger.error(f"Download failed with status {response.status}")
         except Exception as e:
             logger.error(f"Download failed: {e}")
-        return False
+        return None
 
     async def check_cloud_provisioning(self, device_id):
         if not self.provisioning_url: return None
         import aiohttp
         try:
             url = f"{self.provisioning_url.rstrip('/')}/{device_id}.json"
-            # logger.debug(f"☁️ Checking provisioning: {url}") # Zu viel Log
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=2) as response:
                     if response.status == 200:
@@ -121,7 +133,6 @@ class EnOceanMQTTService:
                         logger.info("✨ Provisioning data found!")
                         return data
         except Exception as e:
-            # logger.warning(f"Provisioning check failed: {e}") # Ignorieren bei 404
             pass
         return None
 
@@ -218,12 +229,9 @@ class EnOceanMQTTService:
             
             # --- NEW DEVICE LOGIC ---
             if not device:
-                # FIX: Zuerst prüfen, ob Discovery ÜBERHAUPT aktiv ist!
                 if not self.is_discovery_active():
-                    return # Unbekanntes Gerät & Discovery aus -> Ignorieren
+                    return 
                 
-                # Wenn wir hier sind, ist Discovery AN.
-                # Jetzt prüfen wir erst Cloud Provisioning
                 cloud_config = await self.check_cloud_provisioning(sender_id)
                 
                 if cloud_config:
@@ -236,9 +244,11 @@ class EnOceanMQTTService:
                     eep_to_use = cloud_config.get('eep', 'pending')
                     
                     if target_variant:
-                        local_name = f"PROV-{sender_id}-{target_variant['id']}"
-                        if await self._download_and_save_profile(target_variant['url'], local_name):
-                            eep_to_use = local_name
+                        local_name_hint = f"PROV-{sender_id}-{target_variant['id']}"
+                        # --- FIX: Benutze den zurückgegebenen Namen! ---
+                        real_eep = await self._download_and_save_profile(target_variant['url'], local_name_hint)
+                        if real_eep:
+                            eep_to_use = real_eep
                     
                     self.device_manager.add_device(
                         sender_id,
@@ -252,7 +262,6 @@ class EnOceanMQTTService:
                     if eep_to_use != 'pending':
                          await self.publish_device_discovery(device)
                 
-                # Kein Cloud Treffer -> Standard Discovery (weil Discovery aktiv ist)
                 else:
                     logger.info(f"🆕 NEW DEVICE: {sender_id}")
                     self.device_manager.add_device(sender_id, f"New Device {sender_id}", "pending", "Unknown")
@@ -272,7 +281,10 @@ class EnOceanMQTTService:
 
             # Parsing
             profile = self.eep_loader.get_profile(device['eep'])
-            if not profile: return
+            if not profile: 
+                # Nur Debug, falls Parsing fehlschlägt
+                # logger.warning(f"Profile {device['eep']} not found!")
+                return
             
             parsed_data = self.eep_parser.parse_telegram_with_full_data(packet.data, profile)
 
@@ -299,7 +311,7 @@ class EnOceanMQTTService:
         except Exception as e:
             logger.error(f"Error processing telegram: {e}", exc_info=True)
 
-    # ... (on_command_confirmed etc. bleiben gleich) ...
+    # ... Rest identisch ...
     async def on_command_confirmed(self, d, e, c, s): logger.info(f"Command confirmed {d}")
     async def on_command_timeout(self, d, e, c): logger.warning(f"Command timeout {d}")
     async def handle_command(self, device_id, entity, command):
@@ -325,24 +337,18 @@ class EnOceanMQTTService:
     async def run(self):
         self.running = True
         service_state.set_service(self)
-        
         tasks = [asyncio.create_task(self.run_web_server())]
         await self.initialize()
         service_state.update_status('status', 'running')
-        
         if self.restore_state: await asyncio.sleep(self.restore_delay)
-        
         loop = asyncio.get_running_loop()
         stop_event = asyncio.Event()
         for sig in (signal.SIGINT, signal.SIGTERM):
             try: loop.add_signal_handler(sig, lambda: stop_event.set())
             except: pass
-        
         tasks.append(asyncio.create_task(stop_event.wait()))
         if self.serial_handler: tasks.append(asyncio.create_task(self.run_serial_reader()))
-        
         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-        
         service_state.update_status('status', 'stopping')
         self.running = False
         if self.serial_handler: 
