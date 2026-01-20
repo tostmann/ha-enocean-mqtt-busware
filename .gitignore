@@ -11,3 +11,5 @@ venv/
 addon/rootfs/app/devices.json
 addon/rootfs/app/eep/definitions/provisioned/
 addon/rootfs/app/eep/definitions/custom/
+.DS_Store
+**/.DS_Store
