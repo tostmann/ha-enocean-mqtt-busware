@@ -28,6 +28,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"
@@ -50,11 +51,17 @@
           "bitoffs": "3",
           "bitsize": "1",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  1
+                ]
               },
-              1
+              "ON",
+              "OFF"
             ]
           }
         }

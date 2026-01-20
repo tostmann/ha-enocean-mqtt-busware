@@ -79,6 +79,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"
@@ -137,22 +138,46 @@
         {
           "data": "Button A0 + B0",
           "shortcut": "A0B0",
-          "value": false
+          "value": {
+            "if": [
+              false,
+              "ON",
+              "OFF"
+            ]
+          }
         },
         {
           "data": "Button AI + BI",
           "shortcut": "AIBI",
-          "value": false
+          "value": {
+            "if": [
+              false,
+              "ON",
+              "OFF"
+            ]
+          }
         },
         {
           "data": "Button A0 + BI",
           "shortcut": "A0BI",
-          "value": false
+          "value": {
+            "if": [
+              false,
+              "ON",
+              "OFF"
+            ]
+          }
         },
         {
           "data": "Button AI + B0",
           "shortcut": "AIB0",
-          "value": false
+          "value": {
+            "if": [
+              false,
+              "ON",
+              "OFF"
+            ]
+          }
         }
       ]
     },
@@ -240,11 +265,17 @@
           "bitoffs": "0",
           "bitsize": "8",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  55
+                ]
               },
-              55
+              "ON",
+              "OFF"
             ]
           }
         },
@@ -254,11 +285,17 @@
           "bitoffs": "0",
           "bitsize": "8",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  21
+                ]
               },
-              21
+              "ON",
+              "OFF"
             ]
           }
         },
@@ -268,11 +305,17 @@
           "bitoffs": "0",
           "bitsize": "8",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  53
+                ]
               },
-              53
+              "ON",
+              "OFF"
             ]
           }
         },
@@ -282,11 +325,17 @@
           "bitoffs": "0",
           "bitsize": "8",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  23
+                ]
               },
-              23
+              "ON",
+              "OFF"
             ]
           }
         }

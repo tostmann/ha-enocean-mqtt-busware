@@ -82,6 +82,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"

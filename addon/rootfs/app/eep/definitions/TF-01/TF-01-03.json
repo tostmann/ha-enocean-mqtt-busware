@@ -24,6 +24,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"
@@ -52,7 +53,13 @@
           "shortcut": "BTN",
           "bitoffs": "0",
           "bitsize": "3",
-          "value": true
+          "value": {
+            "if": [
+              true,
+              "ON",
+              "OFF"
+            ]
+          }
         }
       ]
     },
@@ -71,7 +78,13 @@
           "shortcut": "BTN",
           "bitoffs": "0",
           "bitsize": "3",
-          "value": false
+          "value": {
+            "if": [
+              false,
+              "ON",
+              "OFF"
+            ]
+          }
         }
       ]
     }

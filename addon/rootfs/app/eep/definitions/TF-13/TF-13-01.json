@@ -44,17 +44,17 @@
       "component": "sensor"
     },
     "TMP": {
-      "name": "Temperature",
       "component": "sensor",
       "device_class": "temperature",
+      "state_class": "measurement",
       "unit": "°C",
       "icon": "mdi:thermometer",
       "shortcut": "TMP"
     },
     "WND": {
-      "name": "Wind Speed",
       "component": "sensor",
       "device_class": "wind_speed",
+      "state_class": "measurement",
       "unit": "m/s",
       "icon": "mdi:weather-windy",
       "shortcut": "WND"
@@ -63,6 +63,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"

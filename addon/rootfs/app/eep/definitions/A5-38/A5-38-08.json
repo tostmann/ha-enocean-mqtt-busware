@@ -391,6 +391,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"
@@ -429,21 +430,27 @@
           "bitoffs": "8",
           "bitsize": "16",
           "value": {
-            "+": [
+            "if": [
               {
-                "*": [
+                "+": [
                   {
-                    "-": [
+                    "*": [
                       {
-                        "var": "value"
+                        "-": [
+                          {
+                            "var": "value"
+                          },
+                          1
+                        ]
                       },
-                      1
+                      0.09999999999999999
                     ]
                   },
-                  0.09999999999999999
+                  0.1
                 ]
               },
-              0.1
+              "ON",
+              "OFF"
             ]
           },
           "decimals": 1
@@ -461,11 +468,17 @@
           "bitoffs": "29",
           "bitsize": "1",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  1
+                ]
               },
-              1
+              "ON",
+              "OFF"
             ]
           }
         },
@@ -475,7 +488,13 @@
           "bitoffs": "30",
           "bitsize": "1",
           "value": {
-            "var": "value"
+            "if": [
+              {
+                "var": "value"
+              },
+              "ON",
+              "OFF"
+            ]
           }
         },
         {
@@ -484,11 +503,17 @@
           "bitoffs": "31",
           "bitsize": "1",
           "value": {
-            "==": [
+            "if": [
               {
-                "var": "value"
+                "==": [
+                  {
+                    "var": "value"
+                  },
+                  1
+                ]
               },
-              1
+              "ON",
+              "OFF"
             ]
           }
         }

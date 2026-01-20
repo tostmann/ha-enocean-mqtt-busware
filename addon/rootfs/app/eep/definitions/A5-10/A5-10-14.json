@@ -8,17 +8,17 @@
   "bidirectional": false,
   "objects": {
     "TMP": {
-      "name": "Temperature",
       "component": "sensor",
       "device_class": "temperature",
+      "state_class": "measurement",
       "unit": "°C",
       "icon": "mdi:thermometer",
       "shortcut": "TMP"
     },
     "HUM": {
-      "name": "Humidity",
       "component": "sensor",
       "device_class": "humidity",
+      "state_class": "measurement",
       "unit": "%",
       "icon": "mdi:water-percent",
       "shortcut": "HUM"
@@ -27,6 +27,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"

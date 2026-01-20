@@ -8,9 +8,9 @@
   "bidirectional": false,
   "objects": {
     "CO2": {
-      "name": "CO2",
       "component": "sensor",
       "device_class": "carbon_dioxide",
+      "state_class": "measurement",
       "unit": "ppm",
       "icon": "mdi:molecule-co2",
       "shortcut": "CO2"
@@ -19,6 +19,7 @@
       "name": "RSSI",
       "component": "sensor",
       "device_class": "signal_strength",
+      "state_class": "measurement",
       "unit": "dBm",
       "icon": "mdi:wifi",
       "description": "Signal strength"
