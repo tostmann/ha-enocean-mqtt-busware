@@ -14,6 +14,9 @@ BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 if BASE_PATH not in sys.path:
     sys.path.insert(0, BASE_PATH)
 
+# FIX: Persistent Storage Path definition
+DATA_PATH = '/data'
+
 from core.serial_handler import SerialHandler
 from core.esp3_protocol import ESP3Packet
 from core.mqtt_handler import MQTTHandler
@@ -86,7 +89,7 @@ class EnOceanMQTTService:
     # --- Provisioning Logic ---
     async def _download_and_save_profile(self, url, filename_hint):
         """
-        Downloads JSON profile, saves it, and RETURNS THE INTERNAL EEP NAME.
+        Downloads JSON profile, saves it to PERSISTENT storage, and RETURNS THE INTERNAL EEP NAME.
         """
         import aiohttp
         try:
@@ -96,24 +99,21 @@ class EnOceanMQTTService:
                     if response.status == 200:
                         data = await response.json()
                         
-                        # --- FIX: Read the REAL EEP name from JSON ---
                         real_eep_name = data.get('eep')
                         if not real_eep_name:
                             logger.error("Downloaded JSON has no 'eep' field!")
                             return None
 
-                        path = os.path.join(BASE_PATH, 'eep', 'definitions', 'provisioned')
+                        # FIX: Save to /data/eep
+                        path = os.path.join(DATA_PATH, 'eep')
                         os.makedirs(path, exist_ok=True)
                         
-                        # Use the hint for filename, but content determines the EEP ID
                         filename = f"{filename_hint}.json"
                         with open(os.path.join(path, filename), 'w') as f:
                             json.dump(data, f, indent=2)
                         
                         self.eep_loader.load_profiles() 
-                        logger.info(f"✅ Profile loaded. Internal Name: {real_eep_name}")
-                        
-                        # Return the REAL name to be saved in Device DB
+                        logger.info(f"✅ Profile loaded to persistent storage. Internal Name: {real_eep_name}")
                         return real_eep_name
                     else:
                         logger.error(f"Download failed with status {response.status}")
@@ -144,12 +144,15 @@ class EnOceanMQTTService:
         
         service_state.update_status('version', self.addon_version)
 
-        # 1. Load EEPs
-        eep_path = os.path.join(BASE_PATH, 'eep', 'definitions')
-        self.eep_loader = EEPLoader(eep_path)
+        # 1. Load EEPs (Built-in AND Persistent)
+        eep_path_builtin = os.path.join(BASE_PATH, 'eep', 'definitions')
+        eep_path_custom = os.path.join(DATA_PATH, 'eep')
+        
+        # FIX: Loader mit beiden Pfaden initialisieren
+        self.eep_loader = EEPLoader([eep_path_builtin, eep_path_custom])
         self.eep_parser = EEPParser() 
         service_state.update_status('eep_profiles', len(self.eep_loader.profiles))
-        logger.info(f"✓ Loaded {len(self.eep_loader.profiles)} EEP profiles")
+        logger.info(f"✓ EEP Loader initialized (Custom Path: {eep_path_custom})")
 
         # 2. Connection
         if self.serial_port:
@@ -168,11 +171,11 @@ class EnOceanMQTTService:
         else:
             logger.warning("No connection string configured")
 
-        # 3. Core
-        self.device_manager = DeviceManager()
+        # 3. Core (FIX: DeviceManager on persistent storage)
+        self.device_manager = DeviceManager(os.path.join(DATA_PATH, 'devices.json'))
         service_state.update_status('devices', len(self.device_manager.list_devices()))
         
-        self.state_persistence = StatePersistence()
+        self.state_persistence = StatePersistence() # StatePersistence nutzt intern meist eh schon default paths, aber ist hier ok.
         self.command_translator = CommandTranslator(self.eep_loader)
         self.command_tracker = CommandTracker()
         self.command_tracker.set_confirmation_callback(self.on_command_confirmed)
@@ -245,7 +248,7 @@ class EnOceanMQTTService:
                     
                     if target_variant:
                         local_name_hint = f"PROV-{sender_id}-{target_variant['id']}"
-                        # --- FIX: Benutze den zurückgegebenen Namen! ---
+                        # FIX: Download returns real EEP name
                         real_eep = await self._download_and_save_profile(target_variant['url'], local_name_hint)
                         if real_eep:
                             eep_to_use = real_eep
@@ -282,7 +285,6 @@ class EnOceanMQTTService:
             # Parsing
             profile = self.eep_loader.get_profile(device['eep'])
             if not profile: 
-                # Nur Debug, falls Parsing fehlschlägt
                 # logger.warning(f"Profile {device['eep']} not found!")
                 return
             
@@ -311,7 +313,6 @@ class EnOceanMQTTService:
         except Exception as e:
             logger.error(f"Error processing telegram: {e}", exc_info=True)
 
-    # ... Rest identisch ...
     async def on_command_confirmed(self, d, e, c, s): logger.info(f"Command confirmed {d}")
     async def on_command_timeout(self, d, e, c): logger.warning(f"Command timeout {d}")
     async def handle_command(self, device_id, entity, command):
