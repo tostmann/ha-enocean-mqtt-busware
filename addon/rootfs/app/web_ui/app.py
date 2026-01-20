@@ -76,31 +76,37 @@ async def api_device_detail(request):
     
     elif request.method == 'PUT':
         data = await request.json()
+        service = service_state.get_service()
         
-        # PROVISIONING LOGIK
-        if 'provisioning_variant_url' in data:
+        # --- PROVISIONING LOGIC ---
+        # Wenn eine Provisioning-URL übergeben wurde, laden wir das Profil erst herunter
+        if 'provisioning_variant_url' in data and service:
             url = data['provisioning_variant_url']
             vid = data['provisioning_variant_id']
-            new_eep = f"PROV-{device_id}-{vid}"
+            # Generiere eindeutigen Namen für das lokale Profil
+            new_eep_name = f"PROV-{device_id}-{vid}"
             
-            service = service_state.get_service()
-            if await service._download_and_save_profile(url, new_eep):
-                data['eep'] = new_eep
+            # Download anstoßen
+            if await service._download_and_save_profile(url, new_eep_name):
+                # Wenn erfolgreich, setzen wir das EEP auf den neuen Namen
+                data['eep'] = new_eep_name
+                # Entfernen der Hilfsfelder
                 del data['provisioning_variant_url']
                 del data['provisioning_variant_id']
             else:
-                return JSONResponse({'detail': 'Download failed'}, status_code=502)
+                return JSONResponse({'detail': 'Profile download failed'}, status_code=502)
 
+        # Alte Daten für Cleanup merken
         old_device = manager.get_device(device_id)
         old_eep = old_device.get('eep') if old_device else None
         
+        # Update durchführen
         if manager.update_device(device_id, data):
-            service = service_state.get_service()
             if service:
                 new_device = manager.get_device(device_id)
                 new_eep = new_device.get('eep')
                 
-                # Cleanup Old
+                # Cleanup Old Entities (falls EEP gewechselt hat)
                 if old_eep and old_eep != 'pending' and old_eep != new_eep:
                     loader = service_state.get_eep_loader()
                     mqtt = service_state.get_mqtt_handler()
@@ -108,7 +114,7 @@ async def api_device_detail(request):
                         prof = loader.get_profile(old_eep)
                         if prof: mqtt.remove_device(device_id, prof.get_entities())
                 
-                # Publish New
+                # Publish New Entities
                 if new_device.get('enabled') and new_eep != 'pending':
                     await service.publish_device_discovery(new_device)
             
@@ -116,18 +122,37 @@ async def api_device_detail(request):
         return JSONResponse({'detail': 'Failed'}, status_code=400)
     
     elif request.method == 'DELETE':
-        mqtt = service_state.get_mqtt_handler()
+        # --- DELETE LOGIC ---
+        # 1. Wir müssen erst wissen, WELCHE Entities das Gerät hatte, um sie in HA zu löschen
         device = manager.get_device(device_id)
-        if mqtt and device:
-            loader = service_state.get_eep_loader()
-            prof = loader.get_profile(device['eep']) if loader else None
-            ents = prof.get_entities() if prof else []
-            mqtt.remove_device(device_id, ents)
         
-        if manager.remove_device(device_id):
-            service_state.update_status('devices', len(manager.list_devices()))
-            return JSONResponse({'status': 'deleted'})
-        return JSONResponse({'detail': 'Failed'}, status_code=400)
+        if device:
+            mqtt = service_state.get_mqtt_handler()
+            loader = service_state.get_eep_loader()
+            
+            # Versuchen, die Entities via MQTT zu entfernen
+            if mqtt and loader and device.get('eep') != 'pending':
+                try:
+                    profile = loader.get_profile(device['eep'])
+                    if profile:
+                        entities = profile.get_entities()
+                        # Sendet leere Configs an HA
+                        mqtt.remove_device(device_id, entities)
+                except Exception as e:
+                    logger.error(f"Error removing HA entities during delete: {e}")
+
+            # 2. Jetzt erst aus der internen DB löschen
+            if manager.remove_device(device_id):
+                service_state.update_status('devices', len(manager.list_devices()))
+                
+                # MQTT State Topic auch noch leeren (optional)
+                if mqtt:
+                    mqtt.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=True)
+                    mqtt.client.publish(f"enocean/{device_id}/availability", "", qos=1, retain=True)
+
+                return JSONResponse({'status': 'deleted'})
+        
+        return JSONResponse({'detail': 'Delete failed or device not found'}, status_code=400)
 
 async def api_eep_profiles(request):
     loader = service_state.get_eep_loader()
@@ -141,5 +166,9 @@ routes = [
     Route('/api/devices/{device_id}', endpoint=api_device_detail, methods=['GET', 'PUT', 'DELETE']),
     Route('/api/eep-profiles', endpoint=api_eep_profiles),
 ]
-middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])]
+
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
+]
+
 app = Starlette(debug=True, routes=routes, middleware=middleware)
