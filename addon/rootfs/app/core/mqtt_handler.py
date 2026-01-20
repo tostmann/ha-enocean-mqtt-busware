@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os  # <--- DIESER IMPORT FEHLTE!
 import paho.mqtt.client as mqtt
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,9 @@ class MQTTHandler:
         self.port = port
         self.username = username
         self.password = password
+        # Hier wurde 'os' verwendet, ohne importiert zu sein:
         self.client = mqtt.Client(client_id=f"enocean-mqtt-tcp-{os.urandom(4).hex()}")
+        
         if self.username and self.password:
             self.client.username_pw_set(self.username, self.password)
         
@@ -37,7 +40,6 @@ class MQTTHandler:
             self.connected = True
             logger.info("✓ Connected to MQTT broker")
             if self.command_callback:
-                # Re-subscribe on reconnect
                 client.subscribe("enocean/+/set/#")
         else:
             logger.error(f"Failed to connect to MQTT, return code {rc}")
@@ -49,14 +51,11 @@ class MQTTHandler:
     def on_message(self, client, userdata, msg):
         try:
             if not self.command_callback or not self.event_loop: return
-            
-            # Topic: enocean/{device_id}/set/{key}
             parts = msg.topic.split('/')
             if len(parts) >= 4 and parts[2] == 'set':
                 device_id = parts[1]
                 entity_key = parts[3]
                 payload = msg.payload.decode()
-                
                 asyncio.run_coroutine_threadsafe(
                     self.command_callback(device_id, entity_key, payload),
                     self.event_loop
@@ -69,16 +68,10 @@ class MQTTHandler:
         self.client.subscribe("enocean/+/set/#")
 
     def publish_discovery(self, device, entity, controllable=False):
-        """Sendet die Discovery Config an HASS"""
-        # Topic-Aufbau muss identisch sein mit remove_device!
         device_id = device['id']
         key = entity.get('key', 'main')
         component = entity.get('component', 'sensor')
-        
-        # Unique ID generieren
         unique_id = f"{device_id}_{key}"
-        
-        # Discovery Topic: homeassistant/<component>/<unique_id>/config
         discovery_topic = f"homeassistant/{component}/{unique_id}/config"
 
         config = {
@@ -96,14 +89,12 @@ class MQTTHandler:
             "value_template": f"{{{{ value_json.{key} }}}}",
         }
 
-        # Attribute übernehmen
         for attr in ['device_class', 'unit_of_measurement', 'icon']:
             if attr == 'unit_of_measurement':
                 if 'unit' in entity: config[attr] = entity['unit']
             elif attr in entity:
                 config[attr] = entity[attr]
 
-        # Wenn steuerbar (Command)
         if controllable:
             config["command_topic"] = f"enocean/{device_id}/set/{key}"
 
@@ -119,25 +110,16 @@ class MQTTHandler:
         self.client.publish(topic, payload, qos=1, retain=True)
 
     def remove_device(self, device_id, entities):
-        """Entfernt das Gerät aus Home Assistant (durch Senden leerer Configs)"""
         if not self.connected: return
-        
         logger.info(f"🗑 Removing device {device_id} from Home Assistant...")
         
-        # 1. State & Availability löschen (optional, aber sauber)
-        self.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=False) # Retain False, damit es weg ist? Oder leere Message mit Retain True zum löschen.
-        # Bei Retained Topics: Leere Nachricht sendet "löschen".
         self.client.publish(f"enocean/{device_id}/state", "", qos=1, retain=True)
         self.client.publish(f"enocean/{device_id}/availability", "", qos=1, retain=True)
 
-        # 2. Discovery Configs löschen (Das entfernt die Entities)
         for entity in entities:
             key = entity.get('key', 'main')
             component = entity.get('component', 'sensor')
             unique_id = f"{device_id}_{key}"
-            
             discovery_topic = f"homeassistant/{component}/{unique_id}/config"
-            
-            # LEERE NACHRICHT an das Config Topic löscht die Entity in HA
             self.client.publish(discovery_topic, "", qos=1, retain=True)
             logger.debug(f"   -> Cleared discovery topic: {discovery_topic}")
