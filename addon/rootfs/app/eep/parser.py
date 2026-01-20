@@ -7,6 +7,24 @@ class EEPParser:
     def __init__(self):
         pass
 
+    def _get_profile_data(self, profile):
+        """Helper to extract dict data from profile object or dict"""
+        if isinstance(profile, dict):
+            return profile
+        
+        # Falls es ein EEPProfile Objekt ist (aus loader.py)
+        # Versuchen wir typische Attribute
+        if hasattr(profile, 'data'):
+            return profile.data
+        if hasattr(profile, 'config'):
+            return profile.config
+        
+        # Fallback: Versuchen wir es wie ein Dict zu nutzen (duck typing fail safe)
+        try:
+            return profile.__dict__
+        except:
+            return {}
+
     def parse_telegram_with_full_data(self, data, profile):
         """
         Parses raw bytes based on the JSON profile definition.
@@ -14,11 +32,15 @@ class EEPParser:
         """
         if not profile:
             return None
+        
+        # --- FIX: Zugriff auf Daten normalisieren ---
+        profile_data = self._get_profile_data(profile)
+        # --------------------------------------------
 
         # RORG ist das erste Byte
         rorg = data[0]
         
-        eep_name = profile.get('eep', 'Unknown')
+        eep_name = profile_data.get('eep', 'Unknown')
         logger.info(f"📊 Parsing telegram with profile {eep_name}")
         
         # -----------------------------------------------------------
@@ -42,7 +64,7 @@ class EEPParser:
             logger.info(f"4BS (A5) Data Bytes: {data[1:5].hex()}")
 
         # Durchsuche alle 'cases' im Profil
-        for case in profile.get('case', []):
+        for case in profile_data.get('case', []):
             match = True
             
             # A) Check 'data' (Hex String im JSON z.B. "0x10")
@@ -54,7 +76,6 @@ class EEPParser:
             # B) Check 'status' (falls im JSON definiert)
             if match and 'status' in case:
                 case_status_int = int(case['status'], 16)
-                # Status Byte Vergleich (exakt)
                 if case_status_int != status_byte:
                     match = False
             
@@ -84,12 +105,6 @@ class EEPParser:
                         result[shortcut] = int(value)
                 except:
                     result[shortcut] = value # Fallback String ("ON", "OFF")
-
-        # Wenn es Range/Scale Logik gibt (für A5 Sensoren)
-        if 'range' in matched_case.get('datafield', [{}])[0]: 
-            # Das ist komplexer Sensor-Code (A5), hier für F6 Schalter nicht relevant
-            # Würde hier folgen (siehe Original-Code für A5 Logik)
-            pass
 
         logger.info(f"Parsed result: {result}")
         return result
