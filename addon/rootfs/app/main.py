@@ -316,14 +316,69 @@ class EnOceanMQTTService:
     async def on_command_confirmed(self, d, e, c, s): logger.info(f"Command confirmed {d}")
     async def on_command_timeout(self, d, e, c): logger.warning(f"Command timeout {d}")
     async def handle_command(self, device_id, entity, command):
+        """
+        Verarbeitet eingehende MQTT-Befehle und sendet sie an das EnOcean-Gerät.
+        """
         try:
-            if not self.serial_handler: return
+            if not self.serial_handler:
+                logger.warning("Kein Serial-Handler aktiv – Befehl kann nicht gesendet werden.")
+                return
+
             device = self.device_manager.get_device(device_id)
-            if not device or not device.get('enabled'): return
-            logger.info(f"Command for {device_id}: {command}")
+            if not device or not device.get('enabled'):
+                logger.warning(f"Befehl für unbekanntes oder deaktiviertes Gerät {device_id} ignoriert.")
+                return
+
+            logger.info(f"🎮 COMMAND RECEIVED: {device_id} ({entity}) -> {command}")
+            
+            # 1. Übersetzung des MQTT-Befehls in EnOcean-Rohdaten
             result = self.command_translator.translate_command(device, entity, command)
-            if result: pass 
-        except Exception as e: logger.error(f"Cmd Error: {e}")
+            
+            if result:
+                cmd_type, arg1, arg2 = result
+                success = False
+
+                # 2. Senden des Telegramms (Bi-Di)
+                if cmd_type == 'telegram':
+                    # arg1 = RORG, arg2 = Data Bytes
+                    success = await self.serial_handler.send_telegram(device_id, arg1, arg2)
+                
+                elif cmd_type == 'rps':
+                    # arg1 = Button Code, arg2 = Bytes (leer)
+                    success = await self.serial_handler.send_rps_command(device_id, arg1)
+
+                # 3. Tracking & Optimistisches Update
+                if success:
+                    logger.info(f"✅ Befehl erfolgreich an {device_id} gesendet!")
+                    
+                    # Erwarteten Status für den CommandTracker berechnen
+                    expected_state = {}
+                    if 'state' in command:
+                        # Mapping: ON->1, OFF->0
+                        val = 1 if str(command['state']).upper() == 'ON' else 0
+                        expected_state[entity] = val
+                    elif 'brightness' in command:
+                        expected_state['brightness'] = command['brightness']
+                    elif 'position' in command:
+                        expected_state['position'] = command['position']
+                    elif 'value' in command:
+                        expected_state['value'] = command['value']
+
+                    # Tracker aktivieren (für Bestätigungs-Matching)
+                    if expected_state and self.command_tracker:
+                        self.command_tracker.add_pending_command(
+                            device_id, entity, command, expected_state
+                        )
+                    
+                    # Optimistisches Update an MQTT senden (damit UI sofort reagiert)
+                    if self.mqtt_handler and expected_state:
+                         self.mqtt_handler.publish_state(device_id, expected_state, retain=True)
+
+            else:
+                logger.warning(f"⚠️ Keine Übersetzung für Befehl möglich: {command} (EEP: {device.get('eep')})")
+
+        except Exception as e:
+            logger.error(f"❌ Fehler bei Befehlsverarbeitung: {e}", exc_info=True)
 
     async def run_serial_reader(self):
         if self.serial_handler:
