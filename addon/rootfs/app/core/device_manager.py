@@ -1,20 +1,18 @@
 import json
 import os
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 class DeviceManager:
     def __init__(self, storage_path=None):
-        # Intelligente Pfad-Ermittlung
         if storage_path:
             self.storage_path = storage_path
         else:
-            # Wenn wir im Home Assistant Addon sind, existiert /data
             if os.path.exists('/data') and os.access('/data', os.W_OK):
                 self.storage_path = '/data/devices.json'
             else:
-                # Fallback für lokale Entwicklung (damit keine Permission Errors kommen)
                 self.storage_path = os.path.join(os.getcwd(), 'devices.json')
                 logger.info(f"Running locally. Using storage path: {self.storage_path}")
 
@@ -34,14 +32,12 @@ class DeviceManager:
 
     def save_devices(self):
         try:
-            # Sicherstellen, dass das Verzeichnis existiert
             directory = os.path.dirname(self.storage_path)
             if directory and not os.path.exists(directory):
                 os.makedirs(directory, exist_ok=True)
                 
             with open(self.storage_path, 'w') as f:
                 json.dump(self.devices, f, indent=2)
-            # logger.info(f"Devices saved to {self.storage_path}") # Debug level, sonst Spam
         except Exception as e:
             logger.error(f"Error saving devices to {self.storage_path}: {e}")
 
@@ -52,7 +48,6 @@ class DeviceManager:
         return self.devices.get(device_id)
 
     def add_device(self, device_id, name, eep, manufacturer="EnOcean"):
-        # Verhindern, dass wir existierende (konfigurierte) Geräte überschreiben
         if device_id in self.devices and self.devices[device_id].get('eep') != 'pending':
             return False
             
@@ -61,19 +56,17 @@ class DeviceManager:
             "name": name,
             "eep": eep,
             "manufacturer": manufacturer,
-            "enabled": True
+            "enabled": True,
+            "last_seen": datetime.now().isoformat() # Initialer Wert
         }
         self.save_devices()
         return True
 
     def update_device(self, device_id, data):
-        """Update existing device configuration"""
         if device_id not in self.devices:
             return False
-            
-        device = self.devices[device_id]
         
-        # Felder aktualisieren
+        device = self.devices[device_id]
         if 'name' in data: device['name'] = data['name']
         if 'eep' in data: device['eep'] = data['eep']
         if 'manufacturer' in data: device['manufacturer'] = data['manufacturer']
@@ -91,6 +84,8 @@ class DeviceManager:
         return False
         
     def update_last_seen(self, device_id, rssi):
+        """Updates RSSI and Last Seen timestamp in memory"""
         if device_id in self.devices:
             self.devices[device_id]['rssi'] = rssi
-            # Wir speichern RSSI nicht jedes Mal auf die Disk (schont SD-Karte)
+            self.devices[device_id]['last_seen'] = datetime.now().isoformat()
+            # Wir speichern nicht auf Disk, um I/O zu sparen, aber die API liefert es live aus

@@ -1,5 +1,5 @@
 name: "EnOcean MQTT TCP/Serial"
-version: "1.1.63"
+version: "1.1.64"
 slug: "enocean-mqtt-tcp"
 description: "Advanced EnOcean Bridge. Select USB device OR enter TCP Address manually."
 url: "https://github.com/tostmann/ha-enocean-mqtt-slim"
