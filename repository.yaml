@@ -1,3 +1,3 @@
-name: "EnOcean MQTT TCP Repository"
-url: "https://github.com/tostmann/ha-enocean-mqtt-slim"
+name: "EnOcean MQTT busware.de Repository"
+url: "https://github.com/tostmann/ha-enocean-mqtt-busware"
 maintainer: "tostmann"
